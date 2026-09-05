@@ -1,0 +1,18 @@
+name: food_order_backend
+description: A new Dart Frog application
+version: 1.0.0+1
+publish_to: none
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  dart_frog: ^1.1.0
+
+dev_dependencies:
+  dart_frog_lint: ^0.1.0
+  mocktail: ^1.0.0
+  test: ^1.0.0
+
+
+
