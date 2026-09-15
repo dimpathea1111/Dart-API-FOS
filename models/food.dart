@@ -1,8 +1,3 @@
-import 'package:json_annotation/json_annotation.dart';
-
-part 'food.g.dart';
-
-@JsonSerializable()
 class Food {
   final String? id;
   final String name;
@@ -20,6 +15,21 @@ class Food {
     this.isAvailable = true,
   });
 
-  factory Food.fromJson(Map<String, dynamic> json) => _$FoodFromJson(json);
-  Map<String, dynamic> toJson() => _$FoodToJson(this);
+  factory Food.fromJson(Map<String, dynamic> json) => Food(
+        id: json['id'] as String?,
+        name: json['name'] as String,
+        price: (json['price'] as num).toDouble(),
+        description: json['description'] as String,
+        restaurantId: json['restaurantId'] as String,
+        isAvailable: json['isAvailable'] as bool? ?? true,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'price': price,
+        'description': description,
+        'restaurantId': restaurantId,
+        'isAvailable': isAvailable,
+      };
 }
