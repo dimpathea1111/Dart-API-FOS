@@ -1,7 +1,7 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'jwt_utils.dart';
 
-// ⭐ Syntax ថ្មី (សម្រាប់ Auth Routes)
+// ⭐ Syntax ថ្មី (សម្រាប់ Middleware ថ្មី)
 Middleware authMiddleware() {
   return (handler) {
     return (context) async {
@@ -30,8 +30,19 @@ Middleware authMiddleware() {
         );
       }
 
+      final userId = payload['user_id'];
+      if (userId == null || userId is! String) {
+        return Response.json(
+          statusCode: 401,
+          body: {
+            'success': false,
+            'message': 'Invalid token payload',
+          },
+        );
+      }
+
       return handler(
-        context.provide<String>(() => payload['user_id'] as String),
+        context.provide<String>(() => userId),
       );
     };
   };
@@ -66,9 +77,18 @@ Handler authMiddlewareHandler(Handler handler) {
         );
       }
 
-      final updatedContext = context.provide<String>(
-        () => payload['user_id'] as String,
-      );
+      final userId = payload['user_id'];
+      if (userId == null || userId is! String) {
+        return Response.json(
+          statusCode: 401,
+          body: {
+            'success': false,
+            'message': 'Invalid token payload',
+          },
+        );
+      }
+
+      final updatedContext = context.provide<String>(() => userId);
       return handler(updatedContext);
     });
   };

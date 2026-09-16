@@ -67,11 +67,43 @@ class DatabaseService {
   }
 
   static Map<String, dynamic> cleanDocument(Map<String, dynamic> doc) {
-    final clean = Map<String, dynamic>.from(doc);
-    if (clean['_id'] is ObjectId) {
-      clean['id'] = clean['_id'].toHexString();
-      clean.remove('_id');
+  final clean = <String, dynamic>{};
+
+  doc.forEach((key, value) {
+    // បម្លែង ObjectId ទៅ String
+    if (value is ObjectId) {
+      clean[key] = value.toHexString();
     }
-    return clean;
+    // បម្លែង DateTime ទៅ ISO String
+    else if (value is DateTime) {
+      clean[key] = value.toIso8601String();
+    }
+    // បម្លែង List ដែលមាន ObjectId
+    else if (value is List) {
+      clean[key] = value.map((item) {
+        if (item is ObjectId) return item.toHexString();
+        if (item is DateTime) return item.toIso8601String();
+        if (item is Map) return cleanDocument(item.cast<String, dynamic>());
+        return item;
+      }).toList();
+    }
+    // បម្លែង Map ដែលមាន ObjectId
+    else if (value is Map) {
+      clean[key] = cleanDocument(value.cast<String, dynamic>());
+    }
+    // Values ផ្សេងទៀត
+    else {
+      clean[key] = value;
+    }
+  });
+
+  // ប្តូរ _id ទៅ id
+  if (clean.containsKey('_id')) {
+    clean['id'] = clean['_id'];
+    clean.remove('_id');
   }
+
+  return clean;
+}
+
 }
