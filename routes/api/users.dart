@@ -50,8 +50,10 @@ Future<Response> _getAllUsers(RequestContext context) async {
         10;
     final skip = (page - 1) * limit;
 
+    // ទាញទាំងអស់ជា List មុន
     final allUsers = await DatabaseService.users.find().toList();
 
+    // បន្ទាប់មក skip និង take ដោយដៃ
     final users = allUsers.skip(skip).take(limit).toList();
     final total = allUsers.length;
 
@@ -206,7 +208,6 @@ Future<Response> _handlePut(RequestContext context) async {
       }
     }
 
-    // ⭐ បង្កើត ModifierBuilder ដោយប្រើ .set() ម្តងមួយ
     var modifier = modify.set('name', name);
     modifier = modifier.set('email', email);
     modifier = modifier.set('phone', phone);
@@ -267,7 +268,6 @@ Future<Response> _handlePatch(RequestContext context) async {
       return _error('User not found', statusCode: 404);
     }
 
-    // ⭐ ចាប់ផ្តើមជាមួយ modifier ទទេ
     var modifier = modify.set('updated_at', DateTime.now());
     var hasUpdate = false;
 
@@ -387,9 +387,7 @@ Future<Response> _handleDelete(RequestContext context) async {
     } else {
       await DatabaseService.users.updateOne(
         where.eq('_id', ObjectId.fromHexString(id)),
-        modify
-            .set('is_active', false)
-            .set('updated_at', DateTime.now()),
+        modify.set('is_active', false).set('updated_at', DateTime.now()),
       );
       return Response.json(body: {
         'success': true,
