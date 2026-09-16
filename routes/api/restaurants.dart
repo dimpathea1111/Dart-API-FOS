@@ -1,304 +1,439 @@
-import 'dart:convert';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import '../../services/database_service.dart';
-import '../../models/order.dart';
-import '../../utils/auth_middleware.dart';
 
-Handler middleware(Handler handler) => authMiddlewareHandler(handler);Future<Response> onRequest(RequestContext context) async {
-  final method = context.request.method;
-  final path = context.request.uri.pathSegments;
+Future<Response> onRequest(RequestContext context) async {
+  try {
+    final method = context.request.method.value;
 
-  // GET /api/orders
-  if (path.length == 1 && method == HttpMethod.get) {
-    return _getAllOrders(context);
+    switch (method) {
+      case 'GET':
+        return _handleGet(context);
+      case 'POST':
+        return _handlePost(context);
+      case 'PUT':
+        return _handlePut(context);
+      case 'PATCH':
+        return _handlePatch(context);
+      case 'DELETE':
+        return _handleDelete(context);
+      default:
+        return _error('Method not allowed', statusCode: 405);
+    }
+  } catch (e) {
+    return _error('Server error: $e', statusCode: 500);
+  }
+}
+
+// ==================== GET ====================
+Future<Response> _handleGet(RequestContext context) async {
+  try {
+    final id = context.request.uri.queryParameters['id'];
+    final cuisineType = context.request.uri.queryParameters['cuisine_type'];
+    final search = context.request.uri.queryParameters['search'];
+
+    if (id != null && id.isNotEmpty) {
+      return _getRestaurantById(id);
+    }
+    if (cuisineType != null && cuisineType.isNotEmpty) {
+      return _getRestaurantsByCuisine(cuisineType);
+    }
+    if (search != null && search.isNotEmpty) {
+      return _searchRestaurants(search);
+    }
+    return _getAllRestaurants(context);
+  } catch (e) {
+    return _error('Server error: $e', statusCode: 500);
+  }
+}
+
+Future<Response> _getAllRestaurants(RequestContext context) async {
+  try {
+    await DatabaseService.startDb();
+
+    final pageStr = context.request.uri.queryParameters['page'] ?? '1';
+    final limitStr = context.request.uri.queryParameters['limit'] ?? '10';
+    final page = int.tryParse(pageStr) ?? 1;
+    final limit = int.tryParse(limitStr) ?? 10;
+    final skip = (page - 1) * limit;
+
+    final allRestaurants = await DatabaseService.restaurants.find().toList();
+    final restaurants = allRestaurants.skip(skip).take(limit).toList();
+    final total = allRestaurants.length;
+
+    final data = <Map<String, dynamic>>[];
+    for (final r in restaurants) {
+      data.add(DatabaseService.cleanDocument(r));
+    }
+
+    return Response.json(body: {
+      'success': true,
+      'data': data,
+      'pagination': {
+        'page': page,
+        'limit': limit,
+        'total': total,
+        'total_pages': (total / limit).ceil(),
+      },
+    });
+  } catch (e) {
+    return _error('Server error: $e', statusCode: 500);
+  }
+}
+
+Future<Response> _getRestaurantById(String id) async {
+  try {
+    await DatabaseService.startDb();
+
+    if (!ObjectId.isValidHexId(id)) {
+      return _error('Invalid restaurant ID format', statusCode: 400);
+    }
+
+    final restaurantMap = await DatabaseService.restaurants
+        .findOne(where.eq('_id', ObjectId.fromHexString(id)));
+
+    if (restaurantMap == null) {
+      return _error('Restaurant not found', statusCode: 404);
+    }
+
+    return Response.json(body: {
+      'success': true,
+      'data': DatabaseService.cleanDocument(restaurantMap),
+    });
+  } catch (e) {
+    return _error('Server error: $e', statusCode: 500);
+  }
+}
+
+Future<Response> _getRestaurantsByCuisine(String cuisineType) async {
+  try {
+    await DatabaseService.startDb();
+
+    final restaurants = await DatabaseService.restaurants
+        .find(where.eq('cuisine_type', cuisineType))
+        .toList();
+
+    final data = <Map<String, dynamic>>[];
+    for (final r in restaurants) {
+      data.add(DatabaseService.cleanDocument(r));
+    }
+
+    return Response.json(body: {
+      'success': true,
+      'data': data,
+      'count': data.length,
+    });
+  } catch (e) {
+    return _error('Server error: $e', statusCode: 500);
+  }
+}
+
+Future<Response> _searchRestaurants(String search) async {
+  try {
+    await DatabaseService.startDb();
+
+    final allRestaurants = await DatabaseService.restaurants.find().toList();
+    final filtered = allRestaurants.where((r) {
+      final name = (r['name'] as String?)?.toLowerCase() ?? '';
+      final description = (r['description'] as String?)?.toLowerCase() ?? '';
+      final query = search.toLowerCase();
+      return name.contains(query) || description.contains(query);
+    }).toList();
+
+    final data = <Map<String, dynamic>>[];
+    for (final r in filtered) {
+      data.add(DatabaseService.cleanDocument(r));
+    }
+
+    return Response.json(body: {
+      'success': true,
+      'data': data,
+      'count': data.length,
+    });
+  } catch (e) {
+    return _error('Server error: $e', statusCode: 500);
+  }
+}
+
+// ==================== POST ====================
+Future<Response> _handlePost(RequestContext context) async {
+  try {
+    await DatabaseService.startDb();
+
+    final body = await context.request.json() as Map<String, dynamic>;
+    final name = (body['name'] as String?)?.trim();
+
+    if (name == null || name.isEmpty) {
+      return _error('name is required');
+    }
+
+    final restaurantData = {
+      'name': name,
+      'description': body['description'] ?? '',
+      'cuisine_type': body['cuisine_type'] ?? 'Khmer Food',
+      'rating': (body['rating'] ?? 0.0).toDouble(),
+      'delivery_fee': (body['delivery_fee'] ?? 0.0).toDouble(),
+      'min_order_amount': (body['min_order_amount'] ?? 0.0).toDouble(),
+      'phone': body['phone'] ?? '',
+      'email': body['email'] ?? '',
+      'opening_time': body['opening_time'] ?? '08:00',
+      'closing_time': body['closing_time'] ?? '20:00',
+      'is_active': body['is_active'] ?? true,
+      'banner_image': body['banner_image'],
+      'created_at': DateTime.now(),
+      'updated_at': DateTime.now(),
+    };
+
+    final result =
+        await DatabaseService.restaurants.insertOne(restaurantData);
+
+    return Response.json(statusCode: 201, body: {
+      'success': true,
+      'message': 'Restaurant created successfully',
+      'data': {
+        'id': result.id.toHexString(),
+        ...restaurantData,
+        'created_at': restaurantData['created_at'].toString(),
+        'updated_at': restaurantData['updated_at'].toString(),
+      },
+    });
+  } catch (e) {
+    return _error('Server error: $e', statusCode: 500);
+  }
+}
+
+// ==================== PUT ====================
+Future<Response> _handlePut(RequestContext context) async {
+  final id = context.request.uri.queryParameters['id'];
+
+  if (id == null || id.isEmpty) {
+    return _error('id is required for PUT', statusCode: 400);
   }
 
-  // POST /api/orders
-  if (path.length == 1 && method == HttpMethod.post) {
-    return _createOrder(context);
+  try {
+    await DatabaseService.startDb();
+
+    if (!ObjectId.isValidHexId(id)) {
+      return _error('Invalid restaurant ID format', statusCode: 400);
+    }
+
+    final body = await context.request.json() as Map<String, dynamic>;
+
+    final existing = await DatabaseService.restaurants
+        .findOne(where.eq('_id', ObjectId.fromHexString(id)));
+    if (existing == null) {
+      return _error('Restaurant not found', statusCode: 404);
+    }
+
+    final name = (body['name'] as String?)?.trim();
+    if (name == null || name.isEmpty) {
+      return _error('name is required for PUT');
+    }
+
+    var modifier = modify.set('name', name);
+    modifier = modifier.set('description', body['description'] ?? '');
+    modifier =
+        modifier.set('cuisine_type', body['cuisine_type'] ?? 'Khmer Food');
+    modifier = modifier.set('rating', (body['rating'] ?? 0.0).toDouble());
+    modifier = modifier.set(
+      'delivery_fee',
+      (body['delivery_fee'] ?? 0.0).toDouble(),
+    );
+    modifier = modifier.set(
+      'min_order_amount',
+      (body['min_order_amount'] ?? 0.0).toDouble(),
+    );
+    modifier = modifier.set('phone', body['phone'] ?? '');
+    modifier = modifier.set('email', body['email'] ?? '');
+    modifier = modifier.set('opening_time', body['opening_time'] ?? '08:00');
+    modifier = modifier.set('closing_time', body['closing_time'] ?? '20:00');
+    modifier = modifier.set('is_active', body['is_active'] ?? true);
+    modifier = modifier.set('banner_image', body['banner_image']);
+    modifier = modifier.set('updated_at', DateTime.now());
+
+    await DatabaseService.restaurants.updateOne(
+      where.eq('_id', ObjectId.fromHexString(id)),
+      modifier,
+    );
+
+    final updated = await DatabaseService.restaurants
+        .findOne(where.eq('_id', ObjectId.fromHexString(id)));
+
+    return Response.json(body: {
+      'success': true,
+      'message': 'Restaurant updated successfully',
+      'data': updated != null ? DatabaseService.cleanDocument(updated) : null,
+    });
+  } catch (e) {
+    return _error('Server error: $e', statusCode: 500);
+  }
+}
+
+// ==================== PATCH ====================
+Future<Response> _handlePatch(RequestContext context) async {
+  final id = context.request.uri.queryParameters['id'];
+
+  if (id == null || id.isEmpty) {
+    return _error('id is required for PATCH', statusCode: 400);
   }
 
-  // GET /api/orders/{id}
-  if (path.length == 2 && method == HttpMethod.get) {
-    return _getOrder(context, path[1]);
+  try {
+    await DatabaseService.startDb();
+
+    if (!ObjectId.isValidHexId(id)) {
+      return _error('Invalid restaurant ID format', statusCode: 400);
+    }
+
+    final body = await context.request.json() as Map<String, dynamic>;
+
+    final existing = await DatabaseService.restaurants
+        .findOne(where.eq('_id', ObjectId.fromHexString(id)));
+    if (existing == null) {
+      return _error('Restaurant not found', statusCode: 404);
+    }
+
+    var modifier = modify.set('updated_at', DateTime.now());
+    var hasUpdate = false;
+
+    if (body.containsKey('name')) {
+      final v = (body['name'] as String?)?.trim();
+      if (v == null || v.isEmpty) return _error('name cannot be empty');
+      modifier = modifier.set('name', v);
+      hasUpdate = true;
+    }
+
+    if (body.containsKey('description')) {
+      modifier = modifier.set('description', body['description'] ?? '');
+      hasUpdate = true;
+    }
+
+    if (body.containsKey('cuisine_type')) {
+      modifier = modifier.set('cuisine_type', body['cuisine_type']);
+      hasUpdate = true;
+    }
+
+    if (body.containsKey('rating')) {
+      modifier = modifier.set('rating', (body['rating'] as num).toDouble());
+      hasUpdate = true;
+    }
+
+    if (body.containsKey('delivery_fee')) {
+      modifier = modifier.set(
+        'delivery_fee',
+        (body['delivery_fee'] as num).toDouble(),
+      );
+      hasUpdate = true;
+    }
+
+    if (body.containsKey('min_order_amount')) {
+      modifier = modifier.set(
+        'min_order_amount',
+        (body['min_order_amount'] as num).toDouble(),
+      );
+      hasUpdate = true;
+    }
+
+    if (body.containsKey('phone')) {
+      modifier = modifier.set('phone', body['phone']);
+      hasUpdate = true;
+    }
+
+    if (body.containsKey('email')) {
+      modifier = modifier.set('email', body['email']);
+      hasUpdate = true;
+    }
+
+    if (body.containsKey('opening_time')) {
+      modifier = modifier.set('opening_time', body['opening_time']);
+      hasUpdate = true;
+    }
+
+    if (body.containsKey('closing_time')) {
+      modifier = modifier.set('closing_time', body['closing_time']);
+      hasUpdate = true;
+    }
+
+    if (body.containsKey('is_active')) {
+      modifier = modifier.set('is_active', body['is_active']);
+      hasUpdate = true;
+    }
+
+    if (body.containsKey('banner_image')) {
+      modifier = modifier.set('banner_image', body['banner_image']);
+      hasUpdate = true;
+    }
+
+    if (!hasUpdate) {
+      return _error('No fields to update', statusCode: 400);
+    }
+
+    await DatabaseService.restaurants.updateOne(
+      where.eq('_id', ObjectId.fromHexString(id)),
+      modifier,
+    );
+
+    final updated = await DatabaseService.restaurants
+        .findOne(where.eq('_id', ObjectId.fromHexString(id)));
+
+    return Response.json(body: {
+      'success': true,
+      'message': 'Restaurant partially updated',
+      'data': updated != null ? DatabaseService.cleanDocument(updated) : null,
+    });
+  } catch (e) {
+    return _error('Server error: $e', statusCode: 500);
+  }
+}
+
+// ==================== DELETE ====================
+Future<Response> _handleDelete(RequestContext context) async {
+  final id = context.request.uri.queryParameters['id'];
+
+  if (id == null || id.isEmpty) {
+    return _error('id is required for DELETE', statusCode: 400);
   }
 
-  // PUT /api/orders/{id}
-  if (path.length == 2 && method == HttpMethod.put) {
-    return _updateOrder(context, path[1]);
-  }
+  try {
+    await DatabaseService.startDb();
 
-  // DELETE /api/orders/{id}
-  if (path.length == 2 && method == HttpMethod.delete) {
-    return _deleteOrder(context, path[1]);
-  }
+    if (!ObjectId.isValidHexId(id)) {
+      return _error('Invalid restaurant ID format', statusCode: 400);
+    }
 
-  // GET /api/orders/user/{userId}
-  if (path.length == 3 && path[1] == 'user' && method == HttpMethod.get) {
-    return _getOrdersByUser(context, path[2]);
-  }
+    final existing = await DatabaseService.restaurants
+        .findOne(where.eq('_id', ObjectId.fromHexString(id)));
+    if (existing == null) {
+      return _error('Restaurant not found', statusCode: 404);
+    }
 
-  // GET /api/orders/restaurant/{restaurantId}
-  if (path.length == 3 && path[1] == 'restaurant' && method == HttpMethod.get) {
-    return _getOrdersByRestaurant(context, path[2]);
-  }
+    final hardDelete = context.request.uri.queryParameters['hard'] == 'true';
 
-  // GET /api/orders/status/{status}
-  if (path.length == 3 && path[1] == 'status' && method == HttpMethod.get) {
-    return _getOrdersByStatus(context, path[2]);
+    if (hardDelete) {
+      await DatabaseService.restaurants
+          .deleteOne(where.eq('_id', ObjectId.fromHexString(id)));
+      return Response.json(body: {
+        'success': true,
+        'message': 'Restaurant deleted permanently',
+      });
+    } else {
+      await DatabaseService.restaurants.updateOne(
+        where.eq('_id', ObjectId.fromHexString(id)),
+        modify.set('is_active', false).set('updated_at', DateTime.now()),
+      );
+      return Response.json(body: {
+        'success': true,
+        'message': 'Restaurant deactivated (soft delete)',
+      });
+    }
+  } catch (e) {
+    return _error('Server error: $e', statusCode: 500);
   }
+}
 
-  // PATCH /api/orders/{id}/status
-  if (path.length == 3 && path[2] == 'status' && method == HttpMethod.patch) {
-    return _updateOrderStatus(context, path[1]);
-  }
-
-  // PATCH /api/orders/{id}/cancel
-  if (path.length == 3 && path[2] == 'cancel' && method == HttpMethod.patch) {
-    return _cancelOrder(context, path[1]);
-  }
-
-  // GET /api/orders/track/{orderNumber}
-  if (path.length == 3 && path[1] == 'track' && method == HttpMethod.get) {
-    return _trackOrder(context, path[2]);
-  }
-
+// ==================== HELPERS ====================
+Response _error(String message, {int statusCode = 400}) {
   return Response.json(
-    statusCode: 404,
-    body: {'success': false, 'message': 'Endpoint not found'},
+    statusCode: statusCode,
+    body: {'success': false, 'message': message},
   );
-}
-
-Future<Response> _getAllOrders(RequestContext context) async {
-  return DatabaseService.withDb(context, () async {
-    final query = context.request.uri.queryParameters;
-    final filter = <String, dynamic>{};
-    
-    if (query.containsKey('user_id')) filter['user_id'] = query['user_id'];
-    if (query.containsKey('restaurant_id')) filter['restaurant_id'] = query['restaurant_id'];
-    if (query.containsKey('order_status')) filter['order_status'] = query['order_status'];
-    
-    final docs = await DatabaseService.orders.find(filter).toList();
-    final orders = docs.map((doc) => Order.fromJson(doc).toJson()).toList();
-    return Response.json(body: {
-      'success': true,
-      'data': orders,
-      'total': orders.length,
-      'message': 'Orders fetched successfully',
-    });
-  });
-}
-
-Future<Response> _getOrder(RequestContext context, String orderId) async {
-  return DatabaseService.withDb(context, () async {
-    try {
-      final doc = await DatabaseService.orders.findOne({'_id': ObjectId.fromHexString(orderId)});
-      if (doc == null) {
-        return Response.json(
-          statusCode: 404,
-          body: {'success': false, 'message': 'Order not found'},
-        );
-      }
-      return Response.json(body: {
-        'success': true,
-        'data': Order.fromJson(doc).toJson(),
-        'message': 'Order fetched successfully',
-      });
-    } catch (e) {
-      return Response.json(
-        statusCode: 400,
-        body: {'success': false, 'message': 'Invalid order ID'},
-      );
-    }
-  });
-}
-
-Future<Response> _createOrder(RequestContext context) async {
-  return DatabaseService.withDb(context, () async {
-    try {
-      final body = await context.request.body();
-      final json = jsonDecode(body) as Map<String, dynamic>;
-      
-      // Generate order number
-      final orderNumber = 'ORD-${DateTime.now().millisecondsSinceEpoch}';
-      json['order_number'] = orderNumber;
-      json['created_at'] = DateTime.now().toIso8601String();
-      json['updated_at'] = DateTime.now().toIso8601String();
-      json['order_status'] = 'placed';
-      json['payment_status'] = 'pending';
-      
-      await DatabaseService.orders.insertOne(json);
-      return Response.json(
-        statusCode: 201,
-        body: {'success': true, 'data': json, 'message': 'Order created successfully'},
-      );
-    } catch (e) {
-      return Response.json(
-        statusCode: 400,
-        body: {'success': false, 'message': 'Invalid request: $e'},
-      );
-    }
-  });
-}
-
-Future<Response> _updateOrder(RequestContext context, String orderId) async {
-  return DatabaseService.withDb(context, () async {
-    try {
-      final body = await context.request.body();
-      final json = jsonDecode(body) as Map<String, dynamic>;
-      
-      json['updated_at'] = DateTime.now().toIso8601String();
-      
-      await DatabaseService.orders.updateOne(
-        {'_id': ObjectId.fromHexString(orderId)},
-        {'\$set': json},
-      );
-      
-      final updatedDoc = await DatabaseService.orders.findOne({'_id': ObjectId.fromHexString(orderId)});
-      return Response.json(body: {
-        'success': true,
-        'data': Order.fromJson(updatedDoc!).toJson(),
-        'message': 'Order updated successfully',
-      });
-    } catch (e) {
-      return Response.json(
-        statusCode: 400,
-        body: {'success': false, 'message': 'Invalid request: $e'},
-      );
-    }
-  });
-}
-
-Future<Response> _deleteOrder(RequestContext context, String orderId) async {
-  return DatabaseService.withDb(context, () async {
-    try {
-      await DatabaseService.orders.deleteOne({'_id': ObjectId.fromHexString(orderId)});
-      return Response.json(body: {
-        'success': true,
-        'message': 'Order deleted successfully',
-      });
-    } catch (e) {
-      return Response.json(
-        statusCode: 400,
-        body: {'success': false, 'message': 'Invalid order ID'},
-      );
-    }
-  });
-}
-
-Future<Response> _getOrdersByUser(RequestContext context, String userId) async {
-  return DatabaseService.withDb(context, () async {
-    final docs = await DatabaseService.orders.find({'user_id': userId}).toList();
-    final orders = docs.map((doc) => Order.fromJson(doc).toJson()).toList();
-    return Response.json(body: {
-      'success': true,
-      'data': orders,
-      'message': 'Orders fetched successfully',
-    });
-  });
-}
-
-Future<Response> _getOrdersByRestaurant(RequestContext context, String restaurantId) async {
-  return DatabaseService.withDb(context, () async {
-    final docs = await DatabaseService.orders.find({'restaurant_id': restaurantId}).toList();
-    final orders = docs.map((doc) => Order.fromJson(doc).toJson()).toList();
-    return Response.json(body: {
-      'success': true,
-      'data': orders,
-      'message': 'Orders fetched successfully',
-    });
-  });
-}
-
-Future<Response> _getOrdersByStatus(RequestContext context, String status) async {
-  return DatabaseService.withDb(context, () async {
-    final docs = await DatabaseService.orders.find({'order_status': status}).toList();
-    final orders = docs.map((doc) => Order.fromJson(doc).toJson()).toList();
-    return Response.json(body: {
-      'success': true,
-      'data': orders,
-      'message': 'Orders fetched successfully',
-    });
-  });
-}
-
-Future<Response> _updateOrderStatus(RequestContext context, String orderId) async {
-  return DatabaseService.withDb(context, () async {
-    try {
-      final body = await context.request.body();
-      final json = jsonDecode(body) as Map<String, dynamic>;
-      final status = json['status']?.toString();
-      
-      if (status == null || status.isEmpty) {
-        return Response.json(
-          statusCode: 400,
-          body: {'success': false, 'message': 'Status is required'},
-        );
-      }
-      
-      await DatabaseService.orders.updateOne(
-        {'_id': ObjectId.fromHexString(orderId)},
-        {
-          '\$set': {
-            'order_status': status,
-            'updated_at': DateTime.now().toIso8601String(),
-          }
-        },
-      );
-      
-      return Response.json(body: {
-        'success': true,
-        'message': 'Order status updated successfully',
-      });
-    } catch (e) {
-      return Response.json(
-        statusCode: 400,
-        body: {'success': false, 'message': 'Invalid request: $e'},
-      );
-    }
-  });
-}
-
-Future<Response> _cancelOrder(RequestContext context, String orderId) async {
-  return DatabaseService.withDb(context, () async {
-    try {
-      await DatabaseService.orders.updateOne(
-        {'_id': ObjectId.fromHexString(orderId)},
-        {
-          '\$set': {
-            'order_status': 'cancelled',
-            'updated_at': DateTime.now().toIso8601String(),
-          }
-        },
-      );
-      
-      return Response.json(body: {
-        'success': true,
-        'message': 'Order cancelled successfully',
-      });
-    } catch (e) {
-      return Response.json(
-        statusCode: 400,
-        body: {'success': false, 'message': 'Invalid order ID'},
-      );
-    }
-  });
-}
-
-Future<Response> _trackOrder(RequestContext context, String orderNumber) async {
-  return DatabaseService.withDb(context, () async {
-    final doc = await DatabaseService.orders.findOne({'order_number': orderNumber});
-    if (doc == null) {
-      return Response.json(
-        statusCode: 404,
-        body: {'success': false, 'message': 'Order not found'},
-      );
-    }
-    return Response.json(body: {
-      'success': true,
-      'data': Order.fromJson(doc).toJson(),
-      'message': 'Order tracked successfully',
-    });
-  });
 }
