@@ -147,24 +147,26 @@ class DatabaseService {
     }
   }
 
-  // ⭐ Collections ទាំងអស់
-  static DbCollection get users => _db.collection('users');
-  static DbCollection get restaurants => _db.collection('restaurants');
-  static DbCollection get menu => _db.collection('menu');
-  static DbCollection get foods => _db.collection('foods'); // ← បន្ថែម
-  static DbCollection get categories => _db.collection('categories');
-  static DbCollection get addresses => _db.collection('addresses');
-  static DbCollection get orders => _db.collection('orders');
-  static DbCollection get reviews => _db.collection('reviews');
-  static DbCollection get favorites => _db.collection('favorites');
-  static DbCollection get cart => _db.collection('cart');
-  static DbCollection get cartItems => _db.collection('cart_items');
-  static DbCollection get payments => _db.collection('payments');
-  static DbCollection get deliveryDrivers => _db.collection('delivery_drivers');
-  static DbCollection get promotions => _db.collection('promotions');
-  static DbCollection get notifications => _db.collection('notifications');
-  static DbCollection get otpCodes => _db.collection('otp_codes');
-  static DbCollection get refreshTokens => _db.collection('refresh_tokens');
+// ⭐ Collections ទាំងអស់
+static DbCollection get users => _db.collection('users');
+static DbCollection get restaurants => _db.collection('restaurants');
+static DbCollection get menu => _db.collection('menu');
+static DbCollection get foods => _db.collection('foods');
+static DbCollection get categories => _db.collection('categories');
+static DbCollection get addresses => _db.collection('addresses');
+static DbCollection get orders => _db.collection('orders');
+static DbCollection get orderItems => _db.collection('order_items');              // ⭐ បន្ថែម
+static DbCollection get orderStatusHistory => _db.collection('order_status_history');  // ⭐ បន្ថែម
+static DbCollection get reviews => _db.collection('reviews');
+static DbCollection get favorites => _db.collection('favorites');
+static DbCollection get cart => _db.collection('cart');
+static DbCollection get cartItems => _db.collection('cart_items');
+static DbCollection get payments => _db.collection('payments');
+static DbCollection get deliveryDrivers => _db.collection('delivery_drivers');
+static DbCollection get promotions => _db.collection('promotions');
+static DbCollection get notifications => _db.collection('notifications');
+static DbCollection get otpCodes => _db.collection('otp_codes');
+static DbCollection get refreshTokens => _db.collection('refresh_tokens');
   // ⭐ Helper សម្រាប់ Routes ចាស់ៗ
   static Future<Response> withDb(
     RequestContext context,
@@ -186,34 +188,36 @@ class DatabaseService {
     return id.toString();
   }
 
-  // ⭐ Clean Document - បម្លែង ObjectId និង DateTime
   static Map<String, dynamic> cleanDocument(Map<String, dynamic> doc) {
-    final clean = <String, dynamic>{};
+  final clean = <String, dynamic>{};
 
-    doc.forEach((key, value) {
-      if (value is ObjectId) {
-        clean[key] = value.toHexString();
-      } else if (value is DateTime) {
-        clean[key] = value.toIso8601String();
-      } else if (value is List) {
-        clean[key] = value.map((item) {
-          if (item is ObjectId) return item.toHexString();
-          if (item is DateTime) return item.toIso8601String();
-          if (item is Map) return cleanDocument(item.cast<String, dynamic>());
-          return item;
-        }).toList();
-      } else if (value is Map) {
-        clean[key] = cleanDocument(value.cast<String, dynamic>());
-      } else {
-        clean[key] = value;
-      }
-    });
-
-    if (clean.containsKey('_id')) {
-      clean['id'] = clean['_id'];
-      clean.remove('_id');
+  doc.forEach((key, value) {
+    if (value is ObjectId) {
+      clean[key] = value.toHexString();
+    } else if (value is DateTime) {
+      clean[key] = value.toIso8601String();
+    } else if (value is List) {
+      clean[key] = value.map((item) {
+        if (item is ObjectId) return item.toHexString();
+        if (item is DateTime) return item.toIso8601String();
+        if (item is Map) return cleanDocument(item.cast<String, dynamic>());
+        return item;
+      }).toList();
+    } else if (value is Map) {
+      clean[key] = cleanDocument(value.cast<String, dynamic>());
+    } else {
+      clean[key] = value;
     }
+  });
 
-    return clean;
+  if (clean.containsKey('_id')) {
+    clean['id'] = clean['_id'];
+    clean.remove('_id');
   }
+
+  return clean;
+}
+
+
+
 }
