@@ -168,7 +168,7 @@ Future<Response> _getFavoritesByRestaurant(String restaurantId) async {
   }
 }
 
-// ==================== POST ====================
+// POST
 Future<Response> _handlePost(RequestContext context) async {
   try {
     await DatabaseService.startDb();
@@ -216,7 +216,7 @@ Future<Response> _handlePost(RequestContext context) async {
   }
 }
 
-// ==================== DELETE ====================
+// DELETE
 Future<Response> _handleDelete(RequestContext context) async {
   final id = context.request.uri.queryParameters['id'];
   final userId = context.request.uri.queryParameters['user_id'];
@@ -246,7 +246,6 @@ Future<Response> _handleDelete(RequestContext context) async {
       });
     }
 
-    // Delete by user_id + restaurant_id
     if (userId != null && restaurantId != null) {
       if (!ObjectId.isValidHexId(userId)) {
         return _error('Invalid user ID format', statusCode: 400);
@@ -276,7 +275,6 @@ Future<Response> _handleDelete(RequestContext context) async {
   }
 }
 
-// ==================== HELPERS ====================
 Response _error(String message, {int statusCode = 400}) {
   return Response.json(
     statusCode: statusCode,
