@@ -166,6 +166,7 @@ static DbCollection get deliveryDrivers => _db.collection('delivery_drivers');
 static DbCollection get deliveryAssignments => _db.collection('delivery_assignments');
 static DbCollection get promotions => _db.collection('promotions');
 static DbCollection get notifications => _db.collection('notifications');
+static DbCollection get systemLogs => _db.collection('system_logs');
 static DbCollection get otpCodes => _db.collection('otp_codes');
 static DbCollection get refreshTokens => _db.collection('refresh_tokens');
   // ⭐ Helper សម្រាប់ Routes ចាស់ៗ
