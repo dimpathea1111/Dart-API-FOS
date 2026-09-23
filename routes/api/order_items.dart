@@ -1,0 +1,447 @@
+import 'package:dart_frog/dart_frog.dart';
+import 'package:mongo_dart/mongo_dart.dart';
+import '../../services/database_service.dart';
+import '../../utils/auth_middleware.dart';
+
+Handler middleware(Handler handler) => authMiddlewareHandler(handler);
+
+Future<Response> onRequest(RequestContext context) async {
+  try {
+    final method = context.request.method.value;
+
+    switch (method) {
+      case 'GET':
+        return _handleGet(context);
+      case 'POST':
+        return _handlePost(context);
+      case 'PUT':
+        return _handlePut(context);
+      case 'PATCH':
+        return _handlePatch(context);
+      case 'DELETE':
+        return _handleDelete(context);
+      default:
+        return _error('Method not allowed', statusCode: 405);
+    }
+  } catch (e) {
+    return _error('Server error: $e', statusCode: 500);
+  }
+}
+
+// ==================== GET ====================
+Future<Response> _handleGet(RequestContext context) async {
+  final id = context.request.uri.queryParameters['id'];
+  final orderId = context.request.uri.queryParameters['order_id'];
+  final menuId = context.request.uri.queryParameters['menu_id'];
+  final itemStatus = context.request.uri.queryParameters['item_status'];
+
+  if (id != null && id.isNotEmpty) {
+    return _getOrderItemById(id);
+  }
+  if (orderId != null && orderId.isNotEmpty) {
+    return _getOrderItemsByOrder(orderId, itemStatus);
+  }
+  if (menuId != null && menuId.isNotEmpty) {
+    return _getOrderItemsByMenu(menuId);
+  }
+  return _getAllOrderItems(context);
+}
+
+Future<Response> _getAllOrderItems(RequestContext context) async {
+  try {
+    await DatabaseService.startDb();
+
+    final pageStr = context.request.uri.queryParameters['page'] ?? '1';
+    final limitStr = context.request.uri.queryParameters['limit'] ?? '10';
+    final page = int.tryParse(pageStr) ?? 1;
+    final limit = int.tryParse(limitStr) ?? 10;
+    final skip = (page - 1) * limit;
+
+    final allItems = await DatabaseService.orderItems.find().toList();
+    final items = allItems.skip(skip).take(limit).toList();
+    final total = allItems.length;
+
+    final data = <Map<String, dynamic>>[];
+    for (final item in items) {
+      data.add(DatabaseService.cleanDocument(item));
+    }
+
+    return Response.json(body: {
+      'success': true,
+      'data': data,
+      'pagination': {
+        'page': page,
+        'limit': limit,
+        'total': total,
+        'total_pages': (total / limit).ceil(),
+      },
+    });
+  } catch (e) {
+    return _error('Server error: $e', statusCode: 500);
+  }
+}
+
+Future<Response> _getOrderItemById(String id) async {
+  try {
+    await DatabaseService.startDb();
+
+    if (!ObjectId.isValidHexId(id)) {
+      return _error('Invalid order item ID format', statusCode: 400);
+    }
+
+    final itemMap = await DatabaseService.orderItems
+        .findOne(where.eq('_id', ObjectId.fromHexString(id)));
+
+    if (itemMap == null) {
+      return _error('Order item not found', statusCode: 404);
+    }
+
+    final menuId = itemMap['menu_id'];
+    Map<String, dynamic>? menuData;
+    if (menuId is ObjectId) {
+      final menu = await DatabaseService.menu
+          .findOne(where.eq('_id', menuId));
+      if (menu != null) {
+        menuData = DatabaseService.cleanDocument(menu);
+      }
+    }
+
+    return Response.json(body: {
+      'success': true,
+      'data': {
+        ...DatabaseService.cleanDocument(itemMap),
+        if (menuData != null) 'menu': menuData,
+      },
+    });
+  } catch (e) {
+    return _error('Server error: $e', statusCode: 500);
+  }
+}
+
+Future<Response> _getOrderItemsByOrder(String orderId, String? itemStatus) async {
+  try {
+    await DatabaseService.startDb();
+
+    if (!ObjectId.isValidHexId(orderId)) {
+      return _error('Invalid order ID format', statusCode: 400);
+    }
+
+    final query = <String, dynamic>{
+      'order_id': ObjectId.fromHexString(orderId),
+    };
+    if (itemStatus != null && itemStatus.isNotEmpty) {
+      query['item_status'] = itemStatus;
+    }
+
+    final items = await DatabaseService.orderItems.find(query).toList();
+
+    final data = <Map<String, dynamic>>[];
+    double totalAmount = 0;
+
+    for (final item in items) {
+      final cleaned = DatabaseService.cleanDocument(item);
+      final menuId = item['menu_id'];
+
+      if (menuId is ObjectId) {
+        final menu = await DatabaseService.menu
+            .findOne(where.eq('_id', menuId));
+        if (menu != null) {
+          cleaned['menu'] = DatabaseService.cleanDocument(menu);
+        }
+      }
+
+      totalAmount += (item['subtotal'] as num?)?.toDouble() ?? 0;
+      data.add(cleaned);
+    }
+
+    return Response.json(body: {
+      'success': true,
+      'data': data,
+      'count': data.length,
+      'total_amount': totalAmount,
+    });
+  } catch (e) {
+    return _error('Server error: $e', statusCode: 500);
+  }
+}
+
+Future<Response> _getOrderItemsByMenu(String menuId) async {
+  try {
+    await DatabaseService.startDb();
+
+    if (!ObjectId.isValidHexId(menuId)) {
+      return _error('Invalid menu ID format', statusCode: 400);
+    }
+
+    final items = await DatabaseService.orderItems
+        .find(where.eq('menu_id', ObjectId.fromHexString(menuId)))
+        .toList();
+
+    final data = <Map<String, dynamic>>[];
+    for (final item in items) {
+      data.add(DatabaseService.cleanDocument(item));
+    }
+
+    return Response.json(body: {
+      'success': true,
+      'data': data,
+      'count': data.length,
+    });
+  } catch (e) {
+    return _error('Server error: $e', statusCode: 500);
+  }
+}
+
+// ==================== POST ====================
+Future<Response> _handlePost(RequestContext context) async {
+  try {
+    await DatabaseService.startDb();
+
+    final body = await context.request.json() as Map<String, dynamic>;
+    final orderId = body['order_id'] as String?;
+    final menuId = body['menu_id'] as String?;
+    final quantity = body['quantity'] ?? 1;
+    final unitPrice = body['unit_price'];
+
+    if (orderId == null || !ObjectId.isValidHexId(orderId)) {
+      return _error('Valid order_id is required');
+    }
+    if (menuId == null || !ObjectId.isValidHexId(menuId)) {
+      return _error('Valid menu_id is required');
+    }
+    if (unitPrice == null) {
+      return _error('unit_price is required');
+    }
+
+    final price = (unitPrice as num).toDouble();
+    final qty = (quantity as num).toInt();
+    final subtotal = price * qty;
+
+    final itemData = {
+      'order_id': ObjectId.fromHexString(orderId),
+      'menu_id': ObjectId.fromHexString(menuId),
+      'quantity': qty,
+      'unit_price': price,
+      'subtotal': subtotal,
+      'special_notes': body['special_notes'] ?? '',
+      'item_status': body['item_status'] ?? 'confirmed',
+      'created_at': DateTime.now(),
+    };
+
+    final result = await DatabaseService.orderItems.insertOne(itemData);
+
+    return Response.json(statusCode: 201, body: {
+      'success': true,
+      'message': 'Order item created successfully',
+      'data': {
+        'id': result.id.toHexString(),
+        'order_id': orderId,
+        'menu_id': menuId,
+        'quantity': qty,
+        'unit_price': price,
+        'subtotal': subtotal,
+      },
+    });
+  } catch (e) {
+    return _error('Server error: $e', statusCode: 500);
+  }
+}
+
+// ==================== PUT ====================
+Future<Response> _handlePut(RequestContext context) async {
+  final id = context.request.uri.queryParameters['id'];
+
+  if (id == null || id.isEmpty) {
+    return _error('id is required for PUT', statusCode: 400);
+  }
+
+  try {
+    await DatabaseService.startDb();
+
+    if (!ObjectId.isValidHexId(id)) {
+      return _error('Invalid order item ID format', statusCode: 400);
+    }
+
+    final body = await context.request.json() as Map<String, dynamic>;
+
+    final existing = await DatabaseService.orderItems
+        .findOne(where.eq('_id', ObjectId.fromHexString(id)));
+    if (existing == null) {
+      return _error('Order item not found', statusCode: 404);
+    }
+
+    final quantity = body['quantity'];
+    final unitPrice = body['unit_price'];
+
+    if (quantity == null) {
+      return _error('quantity is required for PUT');
+    }
+    if (unitPrice == null) {
+      return _error('unit_price is required for PUT');
+    }
+
+    final qty = (quantity as num).toInt();
+    final price = (unitPrice as num).toDouble();
+    if (qty <= 0) {
+      return _error('quantity must be greater than 0');
+    }
+
+    final subtotal = price * qty;
+
+    var modifier = modify.set('quantity', qty);
+    modifier = modifier.set('unit_price', price);
+    modifier = modifier.set('subtotal', subtotal);
+    modifier = modifier.set('special_notes', body['special_notes'] ?? '');
+    modifier = modifier.set('item_status', body['item_status'] ?? 'confirmed');
+
+    await DatabaseService.orderItems.updateOne(
+      where.eq('_id', ObjectId.fromHexString(id)),
+      modifier,
+    );
+
+    final updated = await DatabaseService.orderItems
+        .findOne(where.eq('_id', ObjectId.fromHexString(id)));
+
+    return Response.json(body: {
+      'success': true,
+      'message': 'Order item updated successfully',
+      'data': updated != null ? DatabaseService.cleanDocument(updated) : null,
+    });
+  } catch (e) {
+    return _error('Server error: $e', statusCode: 500);
+  }
+}
+
+// ==================== PATCH ====================
+Future<Response> _handlePatch(RequestContext context) async {
+  final id = context.request.uri.queryParameters['id'];
+
+  if (id == null || id.isEmpty) {
+    return _error('id is required for PATCH', statusCode: 400);
+  }
+
+  try {
+    await DatabaseService.startDb();
+
+    if (!ObjectId.isValidHexId(id)) {
+      return _error('Invalid order item ID format', statusCode: 400);
+    }
+
+    final body = await context.request.json() as Map<String, dynamic>;
+
+    final existing = await DatabaseService.orderItems
+        .findOne(where.eq('_id', ObjectId.fromHexString(id)));
+    if (existing == null) {
+      return _error('Order item not found', statusCode: 404);
+    }
+
+    var modifier = modify;
+    var hasUpdate = false;
+
+    if (body.containsKey('quantity')) {
+      final qty = (body['quantity'] as num).toInt();
+      if (qty <= 0) {
+        return _error('quantity must be greater than 0');
+      }
+      final price = (existing['unit_price'] as num).toDouble();
+      modifier = modifier.set('quantity', qty);
+      modifier = modifier.set('subtotal', price * qty);
+      hasUpdate = true;
+    }
+
+    if (body.containsKey('unit_price')) {
+      final price = (body['unit_price'] as num).toDouble();
+      final qty = (existing['quantity'] as num).toInt();
+      modifier = modifier.set('unit_price', price);
+      modifier = modifier.set('subtotal', price * qty);
+      hasUpdate = true;
+    }
+
+    if (body.containsKey('special_notes')) {
+      modifier = modifier.set('special_notes', body['special_notes']);
+      hasUpdate = true;
+    }
+
+    if (body.containsKey('item_status')) {
+      modifier = modifier.set('item_status', body['item_status']);
+      hasUpdate = true;
+    }
+
+    if (!hasUpdate) {
+      return _error('No fields to update', statusCode: 400);
+    }
+
+    await DatabaseService.orderItems.updateOne(
+      where.eq('_id', ObjectId.fromHexString(id)),
+      modifier,
+    );
+
+    final updated = await DatabaseService.orderItems
+        .findOne(where.eq('_id', ObjectId.fromHexString(id)));
+
+    return Response.json(body: {
+      'success': true,
+      'message': 'Order item partially updated',
+      'data': updated != null ? DatabaseService.cleanDocument(updated) : null,
+    });
+  } catch (e) {
+    return _error('Server error: $e', statusCode: 500);
+  }
+}
+
+// ==================== DELETE ====================
+Future<Response> _handleDelete(RequestContext context) async {
+  final id = context.request.uri.queryParameters['id'];
+  final orderId = context.request.uri.queryParameters['order_id'];
+
+  try {
+    await DatabaseService.startDb();
+
+    if (orderId != null && orderId.isNotEmpty) {
+      if (!ObjectId.isValidHexId(orderId)) {
+        return _error('Invalid order ID format', statusCode: 400);
+      }
+
+      final result = await DatabaseService.orderItems
+          .deleteMany({'order_id': ObjectId.fromHexString(orderId)});
+
+      return Response.json(body: {
+        'success': true,
+        'message': 'All order items removed',
+        'deleted_count': result.nRemoved,
+      });
+    }
+
+    if (id == null || id.isEmpty) {
+      return _error('id or order_id is required');
+    }
+
+    if (!ObjectId.isValidHexId(id)) {
+      return _error('Invalid order item ID format', statusCode: 400);
+    }
+
+    final existing = await DatabaseService.orderItems
+        .findOne(where.eq('_id', ObjectId.fromHexString(id)));
+    if (existing == null) {
+      return _error('Order item not found', statusCode: 404);
+    }
+
+    await DatabaseService.orderItems
+        .deleteOne(where.eq('_id', ObjectId.fromHexString(id)));
+
+    return Response.json(body: {
+      'success': true,
+      'message': 'Order item removed',
+    });
+  } catch (e) {
+    return _error('Server error: $e', statusCode: 500);
+  }
+}
+
+// ==================== HELPERS ====================
+Response _error(String message, {int statusCode = 400}) {
+  return Response.json(
+    statusCode: statusCode,
+    body: {'success': false, 'message': message},
+  );
+}
