@@ -163,6 +163,7 @@ static DbCollection get favorites => _db.collection('favorites');
 static DbCollection get cart => _db.collection('cart');
 static DbCollection get cartItems => _db.collection('cart_items');
 static DbCollection get payments => _db.collection('payments');
+static DbCollection get transactions => _db.collection('transactions');
 static DbCollection get deliveryDrivers => _db.collection('delivery_drivers');
 static DbCollection get deliveryAssignments => _db.collection('delivery_assignments');
 static DbCollection get promotions => _db.collection('promotions');
