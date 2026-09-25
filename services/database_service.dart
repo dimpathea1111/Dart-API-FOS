@@ -151,6 +151,7 @@ class DatabaseService {
 static DbCollection get users => _db.collection('users');
 static DbCollection get restaurants => _db.collection('restaurants');
 static DbCollection get menu => _db.collection('menu');
+static DbCollection get menuOptions => _db.collection('menu_options');
 static DbCollection get foods => _db.collection('foods');
 static DbCollection get categories => _db.collection('categories');
 static DbCollection get addresses => _db.collection('addresses');
