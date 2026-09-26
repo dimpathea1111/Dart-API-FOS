@@ -171,6 +171,7 @@ static DbCollection get notifications => _db.collection('notifications');
 static DbCollection get systemLogs => _db.collection('system_logs');
 static DbCollection get otpCodes => _db.collection('otp_codes');
 static DbCollection get paymentMethods => _db.collection('payment_methods');
+static DbCollection get promotionMenuItems => _db.collection('promotion_menu_items');
 static DbCollection get orderItemOptions => _db.collection('order_item_options');
 static DbCollection get cartItemOptions => _db.collection('cart_item_options');
 static DbCollection get refreshTokens => _db.collection('refresh_tokens');
