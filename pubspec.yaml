@@ -41,6 +41,7 @@ dependencies:
   uuid: ^4.0.0
 
 dev_dependencies:
-  dart_frog_lint: ^0.1.0
-  mocktail: ^1.0.0
-  test: ^1.0.0
+ dart_frog_cli: ^1.2.0  
+ dart_frog_lint: ^0.1.0
+ mocktail: ^1.0.0
+ test: ^1.0.0
