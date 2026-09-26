@@ -170,6 +170,7 @@ static DbCollection get promotions => _db.collection('promotions');
 static DbCollection get notifications => _db.collection('notifications');
 static DbCollection get systemLogs => _db.collection('system_logs');
 static DbCollection get otpCodes => _db.collection('otp_codes');
+static DbCollection get refunds => _db.collection('refunds');
 static DbCollection get paymentMethods => _db.collection('payment_methods');
 static DbCollection get promotionMenuItems => _db.collection('promotion_menu_items');
 static DbCollection get orderItemOptions => _db.collection('order_item_options');
