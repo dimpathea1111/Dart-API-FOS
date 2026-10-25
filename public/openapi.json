@@ -1,0 +1,1333 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Food-Ordering-System",
+    "version": "1.0.0",
+    "description": ""
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080"
+    },
+    {
+      "url": ""
+    }
+  ],
+  "paths": {
+    "/api/restaurants": {
+      "get": {
+        "summary": "GetAllRestaurants",
+        "parameters": [
+          {
+            "name": "page=1",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "limit=10"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Restaurant"
+        ]
+      },
+      "post": {
+        "summary": "CreateRestaurant",
+        "responses": {},
+        "tags": [
+          "Restaurant"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "cuisine_type": {
+                    "type": "string"
+                  },
+                  "rating": {
+                    "type": "number"
+                  },
+                  "delivery_fee": {
+                    "type": "number"
+                  },
+                  "min_order_amount": {
+                    "type": "integer"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "format": "utc-millisec"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "opening_time": {
+                    "type": "string"
+                  },
+                  "closing_time": {
+                    "type": "string"
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  },
+                  "banner_image": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              },
+              "example": {
+                "name": "ABC Restaurant",
+                "description": "Traditional Khmer cuisine with fresh ingredients",
+                "cuisine_type": "Khmer Food",
+                "rating": 4.5,
+                "delivery_fee": 1.5,
+                "min_order_amount": 5,
+                "phone": "012345678",
+                "email": "abc@restaurant.com",
+                "opening_time": "08:00",
+                "closing_time": "20:00",
+                "is_active": true,
+                "banner_image": "https://example.com/banner.jpg"
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "UpdateRestaurant",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{restaurant_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Restaurant"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "cuisine_type": {
+                    "type": "string"
+                  },
+                  "rating": {
+                    "type": "number"
+                  },
+                  "delivery_fee": {
+                    "type": "integer"
+                  },
+                  "min_order_amount": {
+                    "type": "integer"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "format": "utc-millisec"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "opening_time": {
+                    "type": "string"
+                  },
+                  "closing_time": {
+                    "type": "string"
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  },
+                  "banner_image": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              },
+              "example": {
+                "name": "ABC Restaurant Updated",
+                "description": "Updated description",
+                "cuisine_type": "Khmer Food",
+                "rating": 4.8,
+                "delivery_fee": 2,
+                "min_order_amount": 6,
+                "phone": "0987654321",
+                "email": "abc.updated@restaurant.com",
+                "opening_time": "07:00",
+                "closing_time": "22:00",
+                "is_active": true,
+                "banner_image": "https://example.com/new-banner.jpg"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PatchRestaurant",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{restaurant_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Restaurant"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "rating": {
+                    "type": "number"
+                  },
+                  "delivery_fee": {
+                    "type": "number"
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "example": {
+                "rating": 4.9,
+                "delivery_fee": 2.5,
+                "is_active": false
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "DeleteRestaurant(Soft Delete)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{restaurant_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Restaurant"
+        ]
+      }
+    },
+    "/api/orders": {
+      "post": {
+        "summary": "CreateOrder",
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "application/json"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Food"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string"
+                  },
+                  "restaurant_id": {
+                    "type": "string"
+                  },
+                  "address_id": {
+                    "type": "string"
+                  },
+                  "order_type": {
+                    "type": "string"
+                  },
+                  "delivery_fee": {
+                    "type": "number"
+                  },
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "food_id": {
+                          "type": "string"
+                        },
+                        "quantity": {
+                          "type": "integer"
+                        },
+                        "unit_price": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "user_id": "YOUR_USER_OBJECT_ID",
+                "restaurant_id": "YOUR_RESTAURANT_OBJECT_ID",
+                "address_id": "123 Main Street, Phnom Penh",
+                "order_type": "delivery",
+                "delivery_fee": 1.5,
+                "items": [
+                  {
+                    "food_id": "YOUR_FOOD_OBJECT_ID",
+                    "quantity": 2,
+                    "unit_price": 5.5
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "summary": "Register",
+        "responses": {},
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "format": "utc-millisec"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "name": "Mom Channa",
+                "email": "momchanna123@email.com",
+                "phone": "0961234577",
+                "password": "password1223"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Login",
+        "responses": {},
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "email": "lakna@email.com",
+                "password": "newpassword123"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/forgot_password": {
+      "post": {
+        "summary": "ForgotPassword",
+        "responses": {},
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                }
+              },
+              "example": {
+                "email": "lakna@email.com"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/verify_otp": {
+      "post": {
+        "summary": "VerifyOTP",
+        "responses": {},
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "otp": {
+                    "type": "string",
+                    "format": "color"
+                  }
+                }
+              },
+              "example": {
+                "email": "lakna@email.com",
+                "otp": "625930"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/reset_password": {
+      "post": {
+        "summary": "ResetPassword",
+        "responses": {},
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "new_password": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "email": "lakna@email.com",
+                "new_password": "newpassword123"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "summary": "RefreshToken",
+        "responses": {},
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "refresh_token": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "refresh_token": "{{refresh_token}}"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "get": {
+        "summary": "Logout",
+        "responses": {},
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "refresh_token": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "refresh_token": "{{refresh_token}}"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "CreateAddress",
+        "responses": {},
+        "tags": [
+          "Address"
+        ]
+      },
+      "delete": {
+        "summary": "TastyGo Local",
+        "parameters": [
+          {
+            "name": "cate",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "aaae82f0af91c323b7afb46"
+          },
+          {
+            "name": "mee",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "6aab05aa516b6ed8d1fc7a00"
+          },
+          {
+            "name": "res",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "6aaadca4d81defbd9c997646"
+          },
+          {
+            "name": "access_token",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNmFiMGEwYWJlNTcxNTAxNjg3MWE3ZThiIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc4OTk2MDM2MywiZXhwIjoxNzg5OTYxMjYzfQ.9AQh4pTS9CV0NLkwwQ45nBcWY2GgfawjzMBYNHGuYyY"
+          },
+          {
+            "name": "refresh_token",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNmFiMGEwYWJlNTcxNTAxNjg3MWE3ZThiIiwidHlwZSI6InJlZnJlc2giLCJpYXQiOjE3ODk5NjAzNjMsImV4cCI6MTc5MDU2NTE2M30._A-tc1sY_4mfy7yLXAM0XVqNPIuzrnNDVIulymCy1p0"
+          },
+          {
+            "name": "paymentid",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "6ab1cf2b417de5b233874269"
+          },
+          {
+            "name": "driver",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "6ab2822b5b3963cd38447df4"
+          }
+        ],
+        "responses": {},
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/addresses": {
+      "get": {
+        "summary": "GetAddressbyID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{address_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Address"
+        ]
+      }
+    },
+    "/api/categories": {
+      "post": {
+        "summary": "CreateCategory",
+        "responses": {},
+        "tags": [
+          "Categories"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "image_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "example": {
+                "name": "Khmer Food",
+                "description": "Traditional Khmer dishes",
+                "image_url": "https://example.com/khmer.jpg",
+                "is_active": true
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "GetAllCategories",
+        "parameters": [
+          {
+            "name": "page=1",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "limit=10"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Categories"
+        ]
+      },
+      "put": {
+        "summary": "UpdateCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{category_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Categories"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "image_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "example": {
+                "name": "Khmer Traditional Food",
+                "description": "Updated description for Khmer cuisine",
+                "image_url": "https://example.com/khmer-new.jpg",
+                "is_active": true
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PatchCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{category_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Categories"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "example": {
+                "name": "Khmer Cuisine",
+                "description": "Best Khmer food in town",
+                "is_active": false
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "DeleteCategory(softdelete)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{category_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Categories"
+        ]
+      }
+    },
+    "/api/menu": {
+      "post": {
+        "summary": "CreateMenuItem",
+        "responses": {},
+        "tags": [
+          "Menu"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "restaurant_id": {
+                    "type": "string"
+                  },
+                  "category_id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "price": {
+                    "type": "integer"
+                  },
+                  "discount_price": {
+                    "type": "integer"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "preparation_time": {
+                    "type": "integer"
+                  },
+                  "is_available": {
+                    "type": "boolean"
+                  },
+                  "is_veg": {
+                    "type": "boolean"
+                  },
+                  "spice_level": {
+                    "type": "string"
+                  },
+                  "calories": {
+                    "type": "integer"
+                  },
+                  "image_urls": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "restaurant_id": "6a9c36fce7a0033d22ff6151",
+                "category_id": "6a9c37e344485aa0e020d7aa",
+                "name": "Beef Burger",
+                "description": "Fresh beef with salad and cheese",
+                "price": 7,
+                "discount_price": 5,
+                "currency": "USD",
+                "preparation_time": 15,
+                "is_available": true,
+                "is_veg": false,
+                "spice_level": "mild",
+                "calories": 450,
+                "image_urls": [
+                  "https://example.com/burger.jpg"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "GetAllMenu",
+        "parameters": [
+          {
+            "name": "page=1",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "limit=10"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Menu"
+        ]
+      },
+      "put": {
+        "summary": "UpdateMenuItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{menu_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Menu"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "restaurant_id": {
+                    "type": "string"
+                  },
+                  "category_id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "price": {
+                    "type": "number"
+                  },
+                  "discount_price": {
+                    "type": "integer"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "preparation_time": {
+                    "type": "integer"
+                  },
+                  "is_available": {
+                    "type": "boolean"
+                  },
+                  "is_veg": {
+                    "type": "boolean"
+                  },
+                  "spice_level": {
+                    "type": "string"
+                  },
+                  "calories": {
+                    "type": "integer"
+                  },
+                  "image_urls": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "restaurant_id": "{{restaurant_id}}",
+                "category_id": "{{category_id}}",
+                "name": "Beef Burger Deluxe",
+                "description": "Premium beef with extra cheese",
+                "price": 6.5,
+                "discount_price": 8,
+                "currency": "USD",
+                "preparation_time": 20,
+                "is_available": true,
+                "is_veg": false,
+                "spice_level": "medium",
+                "calories": 550,
+                "image_urls": [
+                  "https://example.com/burger-deluxe.jpg"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PatchMenuItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{menu_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Menu"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "price": {
+                    "type": "integer"
+                  },
+                  "is_available": {
+                    "type": "boolean"
+                  },
+                  "spice_level": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "price": 7,
+                "is_available": false,
+                "spice_level": "hot"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "DeleteMenuItem(Soft Delete)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{menu_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Menu"
+        ]
+      }
+    },
+    "/api/cart": {
+      "post": {
+        "summary": "CreateCart",
+        "responses": {},
+        "tags": [
+          "Cart"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string"
+                  },
+                  "restaurant_id": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "user_id": "{{user_id}}",
+                "restaurant_id": "{{restaurant_id}}"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "DeleteCartSoft",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{cart_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Cart"
+        ]
+      }
+    },
+    "/api/payments": {
+      "post": {
+        "summary": "CreatePayment",
+        "responses": {},
+        "tags": [
+          "Payments"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "order_id": {
+                    "type": "string"
+                  },
+                  "user_id": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "number"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "payment_type": {
+                    "type": "string"
+                  },
+                  "transaction_id": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "order_id": "{{order_id}}",
+                "user_id": "6ab058e62303b67da8c8f113",
+                "amount": 18.5,
+                "currency": "USD",
+                "payment_type": "online",
+                "transaction_id": "TXN-20260921-001",
+                "status": "success"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications": {
+      "delete": {
+        "summary": "SotfDelete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{notification_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Notifications"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/system_logs": {
+      "post": {
+        "summary": "CreateLog",
+        "responses": {},
+        "tags": [
+          "SystemLogs"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string"
+                  },
+                  "action": {
+                    "type": "string"
+                  },
+                  "details": {
+                    "type": "string"
+                  },
+                  "ip_address": {
+                    "type": "string",
+                    "format": "ip-address"
+                  },
+                  "user_agent": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "user_id": "{{user_id}}",
+                "action": "PAYMENT_SUCCESS",
+                "details": "Payment of $18.50 completed",
+                "ip_address": "192.168.1.1",
+                "user_agent": "Mozilla/5.0"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "ClearOldsLog",
+        "parameters": [
+          {
+            "name": "clear_old",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 30
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "SystemLogs"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/menu_options": {
+      "post": {
+        "summary": "CreateMenuOption",
+        "responses": {},
+        "tags": [
+          "MenuOption"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "menu_id": {
+                    "type": "string"
+                  },
+                  "option_group": {
+                    "type": "string"
+                  },
+                  "option_name": {
+                    "type": "string"
+                  },
+                  "option_price": {
+                    "type": "integer"
+                  },
+                  "is_required": {
+                    "type": "boolean"
+                  },
+                  "selection_type": {
+                    "type": "string"
+                  },
+                  "max_select": {
+                    "type": "integer"
+                  },
+                  "sort_order": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "menu_id": "{{menu_id}}",
+                "option_group": "Toppings",
+                "option_name": "Extra Cheese",
+                "option_price": 1,
+                "is_required": false,
+                "selection_type": "multiple",
+                "max_select": 5,
+                "sort_order": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/order_item_options": {
+      "post": {
+        "summary": "CreateOrderITemOption",
+        "responses": {},
+        "tags": [
+          "OrderItemOption"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "order_item_id": {
+                    "type": "string"
+                  },
+                  "menu_option_id": {
+                    "type": "string"
+                  },
+                  "option_name": {
+                    "type": "string"
+                  },
+                  "option_price": {
+                    "type": "integer"
+                  },
+                  "quantity": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "order_item_id": "{{order_item_id}}",
+                "menu_option_id": "{{menu_option_id}}",
+                "option_name": "Large",
+                "option_price": 2,
+                "quantity": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

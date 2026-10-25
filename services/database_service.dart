@@ -147,7 +147,6 @@ class DatabaseService {
     }
   }
 
-// ⭐ Collections ទាំងអស់
 static DbCollection get users => _db.collection('users');
 static DbCollection get restaurants => _db.collection('restaurants');
 static DbCollection get menu => _db.collection('menu');
@@ -176,7 +175,6 @@ static DbCollection get promotionMenuItems => _db.collection('promotion_menu_ite
 static DbCollection get orderItemOptions => _db.collection('order_item_options');
 static DbCollection get cartItemOptions => _db.collection('cart_item_options');
 static DbCollection get refreshTokens => _db.collection('refresh_tokens');
-  // ⭐ Helper សម្រាប់ Routes ចាស់ៗ
   static Future<Response> withDb(
     RequestContext context,
     Future<Response> Function() callback,
