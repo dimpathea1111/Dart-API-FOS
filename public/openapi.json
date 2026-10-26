@@ -505,10 +505,10 @@
                 }
               },
               "example": {
-                "name": "Dim Vipha",
-                "email": "vipha@email.com",
-                "phone": "060784361",
-                "password": "password143"
+                "name": "Rin Yakya",
+                "email": "yakya@email.com",
+                "phone": "0509084361",
+                "password": "password134"
               }
             }
           }
@@ -543,8 +543,8 @@
                 }
               },
               "example": {
-                "email": "vipha@email.com",
-                "password": "password143"
+                "email": "yakya@email.com",
+                "password": "password134"
               }
             }
           }
@@ -3456,6 +3456,207 @@
         ]
       }
     },
+    "/api/order_items": {
+      "post": {
+        "summary": "CreateItems",
+        "responses": {},
+        "tags": [
+          "OrderItems"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "order_id": {
+                    "type": "string"
+                  },
+                  "menu_id": {
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "type": "integer"
+                  },
+                  "unit_price": {
+                    "type": "integer"
+                  },
+                  "special_notes": {
+                    "type": "string"
+                  },
+                  "item_status": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "order_id": "{{order_id}}",
+                "menu_id": "6ab41058b2ed6495668b1e8d",
+                "quantity": 2,
+                "unit_price": 7,
+                "special_notes": "No spicy",
+                "item_status": "confirmed"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "GetAllOrderItems",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 10
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "OrderItems"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "UpdateOrderITem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{order_item_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "OrderItems"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "quantity": {
+                    "type": "integer"
+                  },
+                  "unit_price": {
+                    "type": "integer"
+                  },
+                  "special_notes": {
+                    "type": "string"
+                  },
+                  "item_status": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "quantity": 3,
+                "unit_price": 7,
+                "special_notes": "Extra cheese",
+                "item_status": "preparing"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PatchOrderITem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{order_item_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "OrderItems"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "quantity": {
+                    "type": "integer"
+                  },
+                  "item_status": {
+                    "type": "string"
+                  },
+                  "special_notes": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "quantity": 5,
+                "item_status": "ready",
+                "special_notes": "No onions"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "DeleteOrderItem Request",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{order_item_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "OrderItems"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
     "/api/menu_options": {
       "post": {
         "summary": "CreateMenuOption",
@@ -3672,6 +3873,376 @@
         ]
       }
     },
+    "/api/transactions": {
+      "post": {
+        "summary": "CreateTransaction",
+        "responses": {},
+        "tags": [
+          "Transactions"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "integer"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "reference_id": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "user_id": "{{user_id}}",
+                "type": "credit",
+                "amount": 100,
+                "description": "Wallet top-up",
+                "reference_id": "TOPUP-20260925-001"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "GetAllTransaction",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 10
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Transactions"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "UpdateTransaction",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{transaction_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Transactions"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "integer"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "reference_id": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "type": "credit",
+                "amount": 150,
+                "description": "Updated top-up",
+                "reference_id": "TOPUP-20260925-002"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PatchTransaction",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{transaction_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Transactions"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "description": "Updated description",
+                "amount": 200
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "DeleteTransaction",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{transaction_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Transactions"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/cart_item_options": {
+      "post": {
+        "summary": "GetOptionToCartItem",
+        "responses": {},
+        "tags": [
+          "CartItemOptions"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cart_item_id": {
+                    "type": "string"
+                  },
+                  "menu_option_id": {
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "cart_item_id": "{{cart_item_id}}",
+                "menu_option_id": "{{menu_option_id}}",
+                "quantity": 1
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "GetAllCartItemOptions",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 10
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "CartItemOptions"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "UpdateOption",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{cart_item_option_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "CartItemOptions"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "quantity": {
+                    "type": "integer"
+                  },
+                  "price_adjustment": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "quantity": 2,
+                "price_adjustment": 4
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PatchOptionQuantity",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{cart_item_option_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "CartItemOptions"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "quantity": {
+                    "type": "integer"
+                  },
+                  "price_adjustment": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "quantity": 3,
+                "price_adjustment": 5
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "RemoveOption",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{cart_item_option_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "CartItemOptions"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
     "/api/order_item_options": {
       "post": {
         "summary": "CreateOrderITemOption",
@@ -3704,7 +4275,7 @@
               },
               "example": {
                 "order_item_id": "{{order_item_id}}",
-                "menu_option_id": "{{menu_option_id}}",
+                "menu_option_id": "6ab657aac88669a061bc7ddf",
                 "option_name": "Large",
                 "option_price": 2,
                 "quantity": 1
@@ -3712,6 +4283,926 @@
             }
           }
         }
+      },
+      "get": {
+        "summary": "GetAllOrderITemOption",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 10
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "OrderItemOption"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "UpdateOrderItemOption",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{order_item_option_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "OrderItemOption"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "option_name": {
+                    "type": "string"
+                  },
+                  "option_price": {
+                    "type": "integer"
+                  },
+                  "quantity": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "option_name": "Extra Large",
+                "option_price": 3,
+                "quantity": 2
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PatchOrderItemOption",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{order_item_option_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "OrderItemOption"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "quantity": {
+                    "type": "integer"
+                  },
+                  "option_price": {
+                    "type": "number"
+                  },
+                  "option_name": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "quantity": 3,
+                "option_price": 2.5,
+                "option_name": "Medium"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "DeleteOrderItemOption",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{order_item_option_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "OrderItemOption"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/payment_methods": {
+      "post": {
+        "summary": "AddPaymentMethod",
+        "responses": {},
+        "tags": [
+          "PaymentMethod"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string"
+                  },
+                  "method_type": {
+                    "type": "string"
+                  },
+                  "provider": {
+                    "type": "string"
+                  },
+                  "is_default": {
+                    "type": "boolean"
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "example": {
+                "user_id": "{{user_id}}",
+                "method_type": "cod",
+                "provider": "Cash on Delivery",
+                "is_default": false,
+                "is_active": true
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "GetAllPaymentMEthod",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 10
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "PaymentMethod"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "UpdatePaymentMethod",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{payment_method_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "PaymentMethod"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "method_type": {
+                    "type": "string"
+                  },
+                  "provider": {
+                    "type": "string"
+                  },
+                  "card_last4": {
+                    "type": "string",
+                    "format": "utc-millisec"
+                  },
+                  "card_brand": {
+                    "type": "string"
+                  },
+                  "expiry_date": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "is_default": {
+                    "type": "boolean"
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "example": {
+                "method_type": "card",
+                "provider": "Mastercard",
+                "card_last4": "5678",
+                "card_brand": "Mastercard",
+                "expiry_date": "2027-12-31T00:00:00Z",
+                "is_default": true,
+                "is_active": true
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PatchPaymentMethod",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{payment_method_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "PaymentMethod"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "is_default": {
+                    "type": "boolean"
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  },
+                  "provider": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "is_default": true,
+                "is_active": false,
+                "provider": "ABA Pay"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "SoftDelete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{payment_method_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "PaymentMethod"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/promotion_menu_items": {
+      "post": {
+        "summary": "LinkMenuItemToPromotion",
+        "responses": {},
+        "tags": [
+          "PromotionMenuItems"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "promotion_id": {
+                    "type": "string"
+                  },
+                  "menu_id": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "promotion_id": "{{promotion_id}}",
+                "menu_id": "6adeb9b934512e06161772bb"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "GetAllPromotionMenuItems",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 10
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "PromotionMenuItems"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "UpdatePromotionMenuItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{promotion_menu_item_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "PromotionMenuItems"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "promotion_id": {
+                    "type": "string"
+                  },
+                  "menu_id": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "promotion_id": "6ab32d6a3eeb00c577cc0a96",
+                "menu_id": "{{new_menu_id}}"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PatchPromotionMenuItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{promotion_menu_item_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "PromotionMenuItems"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "menu_id": {
+                    "type": "string"
+                  },
+                  "promotion_id": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "menu_id": "{{new_menu_id}}",
+                "promotion_id": "{{new_promotion_id}}"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "UnlinkMenuItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{promotion_menu_item_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "PromotionMenuItems"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/order_status_history": {
+      "post": {
+        "summary": "CreateStatusHistory",
+        "responses": {},
+        "tags": [
+          "OrderStatusHistory"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "order_id": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "notes": {
+                    "type": "string"
+                  },
+                  "created_by": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "order_id": "{{order_id}}",
+                "status": "placed",
+                "notes": "Order placed successfully",
+                "created_by": "{{user_id}}"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "GetAllStatusHistory",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 10
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "OrderStatusHistory"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "UpdateStatusHistory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{history_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "OrderStatusHistory"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string"
+                  },
+                  "notes": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "status": "confirmed",
+                "notes": "Updated status note"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PatchStatusHistory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{history_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "OrderStatusHistory"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "notes": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "notes": "Additional notes",
+                "status": "preparing"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "DeleteStatusHistory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{history_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "OrderStatusHistory"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/refunds": {
+      "post": {
+        "summary": "CreateRefundRequest",
+        "responses": {},
+        "tags": [
+          "Refund"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "order_id": {
+                    "type": "string"
+                  },
+                  "payment_id": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "number"
+                  },
+                  "reason": {
+                    "type": "string"
+                  },
+                  "refund_method": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "order_id": "{{order_id}}",
+                "payment_id": "{{payment_id}}",
+                "amount": 18.5,
+                "reason": "Food was cold",
+                "refund_method": "original_payment",
+                "status": "pending"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "GetAllRefunds",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 10
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "pending"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Refund"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "UpdateRefund",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{refund_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Refund"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "reason": {
+                    "type": "string"
+                  },
+                  "refund_method": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "approved_by": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "amount": 18.5,
+                "reason": "Updated reason",
+                "refund_method": "wallet",
+                "status": "approved",
+                "approved_by": "{{admin_id}}"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "ApproveRefund",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{refund_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Refund"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string"
+                  },
+                  "approved_by": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "status": "approved",
+                "approved_by": "{{admin_id}}"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "RejectRefund(softDelete)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{refund_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Refund"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
       }
     }
   },
