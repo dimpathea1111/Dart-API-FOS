@@ -318,6 +318,161 @@
             }
           }
         }
+      },
+      "get": {
+        "summary": "GetAllOrders",
+        "parameters": [
+          {
+            "name": "page=1",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "limit=10"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "UpdateOrder",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{order_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "order_status": {
+                    "type": "string"
+                  },
+                  "payment_status": {
+                    "type": "string"
+                  },
+                  "subtotal": {
+                    "type": "integer"
+                  },
+                  "tax": {
+                    "type": "number"
+                  },
+                  "delivery_fee": {
+                    "type": "integer"
+                  },
+                  "total_amount": {
+                    "type": "number"
+                  },
+                  "delivery_instructions": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "order_status": "confirmed",
+                "payment_status": "paid",
+                "subtotal": 15,
+                "tax": 1.5,
+                "delivery_fee": 2,
+                "total_amount": 18.5,
+                "delivery_instructions": "Ring the bell"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PatchOrderStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{order_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "order_status": {
+                    "type": "string"
+                  },
+                  "payment_status": {
+                    "type": "string"
+                  },
+                  "actual_delivery_time": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              "example": {
+                "order_status": "preparing",
+                "payment_status": "paid",
+                "actual_delivery_time": "2026-09-21T10:30:00Z"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "CancelOrder(softDelete)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{order_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
       }
     },
     "/api/auth/register": {
@@ -350,10 +505,10 @@
                 }
               },
               "example": {
-                "name": "Mom Channa",
-                "email": "momchanna123@email.com",
-                "phone": "0961234577",
-                "password": "password1223"
+                "name": "Dim Vipha",
+                "email": "vipha@email.com",
+                "phone": "060784361",
+                "password": "password143"
               }
             }
           }
@@ -366,6 +521,11 @@
         "responses": {},
         "tags": [
           "Authentication"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
         ],
         "requestBody": {
           "content": {
@@ -383,8 +543,8 @@
                 }
               },
               "example": {
-                "email": "lakna@email.com",
-                "password": "newpassword123"
+                "email": "vipha@email.com",
+                "password": "password143"
               }
             }
           }
@@ -533,12 +693,247 @@
         }
       }
     },
-    "/": {
-      "get": {
+    "/api/addresses": {
+      "post": {
         "summary": "CreateAddress",
         "responses": {},
         "tags": [
           "Address"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string"
+                  },
+                  "address_line1": {
+                    "type": "string"
+                  },
+                  "address_line2": {
+                    "type": "string"
+                  },
+                  "city": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string"
+                  },
+                  "zipcode": {
+                    "type": "string",
+                    "format": "utc-millisec"
+                  },
+                  "country": {
+                    "type": "string"
+                  },
+                  "latitude": {
+                    "type": "number"
+                  },
+                  "longitude": {
+                    "type": "number"
+                  },
+                  "address_type": {
+                    "type": "string"
+                  },
+                  "is_default": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "example": {
+                "user_id": "{{user_id}}",
+                "address_line1": "House 123, Street 5",
+                "address_line2": "Sangkat Toul Kork",
+                "city": "Phnom Penh",
+                "state": "Phnom Penh",
+                "zipcode": "12000",
+                "country": "Cambodia",
+                "latitude": 11.5564,
+                "longitude": 104.9282,
+                "address_type": "home",
+                "is_default": true
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "GetAllAddresses",
+        "parameters": [
+          {
+            "name": "page=1",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "limit=10"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Address"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "UpdateAddress",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{address_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Address"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "address_line1": {
+                    "type": "string"
+                  },
+                  "address_line2": {
+                    "type": "string"
+                  },
+                  "city": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string"
+                  },
+                  "zipcode": {
+                    "type": "string",
+                    "format": "utc-millisec"
+                  },
+                  "country": {
+                    "type": "string"
+                  },
+                  "latitude": {
+                    "type": "number"
+                  },
+                  "longitude": {
+                    "type": "number"
+                  },
+                  "address_type": {
+                    "type": "string"
+                  },
+                  "is_default": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "example": {
+                "address_line1": "House 456, Street 8",
+                "address_line2": "Sangkat Boeung Keng Kang",
+                "city": "Phnom Penh",
+                "state": "Phnom Penh",
+                "zipcode": "12001",
+                "country": "Cambodia",
+                "latitude": 11.5564,
+                "longitude": 104.9282,
+                "address_type": "office",
+                "is_default": false
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PatchAddress",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{address_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Address"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "city": {
+                    "type": "string"
+                  },
+                  "address_line1": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "city": "Siem Reap",
+                "address_line1": "House 789, Street 10"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "DeleteAddress",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{address_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Address"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "New Request",
+        "responses": {},
+        "tags": [
+          "Users"
         ]
       },
       "delete": {
@@ -609,9 +1004,52 @@
         ]
       }
     },
-    "/api/addresses": {
-      "get": {
-        "summary": "GetAddressbyID",
+    "/api/users": {
+      "post": {
+        "summary": "CreateUser",
+        "responses": {},
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "format": "utc-millisec"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "name": "SokSopheap nam",
+                "email": "sok.man@email.com",
+                "phone": "040909088",
+                "password": "password123"
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "UpdateUser",
         "parameters": [
           {
             "name": "id",
@@ -619,12 +1057,131 @@
             "schema": {
               "type": "string"
             },
-            "example": "{{address_id}}"
+            "example": "6ade9dc62d421f815a645b27"
           }
         ],
         "responses": {},
         "tags": [
-          "Address"
+          "Users"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "format": "utc-millisec"
+                  },
+                  "profile_pic": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "preferred_language": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "name": "Kon Lakna Updated",
+                "email": "lakna.updated@email.com",
+                "phone": "0959998888",
+                "profile_pic": "https://example.com/pic.jpg",
+                "preferred_language": "km"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "UpdateUser(partial)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{user_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "format": "utc-millisec"
+                  },
+                  "preferred_language": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "name": "Kon Lakna Patched",
+                "phone": "0901234567",
+                "preferred_language": "km"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "DeleteUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "6ade9dc62d421f815a645b27"
+          },
+          {
+            "name": "hard",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "example": true
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
         ]
       }
     },
@@ -796,6 +1353,11 @@
         "responses": {},
         "tags": [
           "Menu"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
         ],
         "requestBody": {
           "content": {
@@ -1068,6 +1630,101 @@
           }
         }
       },
+      "get": {
+        "summary": "GetAllCarts",
+        "responses": {},
+        "tags": [
+          "Cart"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "UpdateCart",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{cart_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Cart"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "restaurant_id": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "restaurant_id": "6adea0242d421f815a645b2a"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PatchCart",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{cart_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Cart"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "restaurant_id": {
+                    "type": "string"
+                  },
+                  "expires_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              "example": {
+                "restaurant_id": "{{restaurant_id}}",
+                "expires_at": "2026-09-30T23:59:59Z"
+              }
+            }
+          }
+        }
+      },
       "delete": {
         "summary": "DeleteCartSoft",
         "parameters": [
@@ -1083,6 +1740,11 @@
         "responses": {},
         "tags": [
           "Cart"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
         ]
       }
     },
@@ -1124,7 +1786,7 @@
               },
               "example": {
                 "order_id": "{{order_id}}",
-                "user_id": "6ab058e62303b67da8c8f113",
+                "user_id": "6ab0430a1c538aae485177b9",
                 "amount": 18.5,
                 "currency": "USD",
                 "payment_type": "online",
@@ -1134,9 +1796,1276 @@
             }
           }
         }
+      },
+      "get": {
+        "summary": "GetAllPayment",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 10
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Payments"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "UpdatePayment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{payment_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Payments"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "number"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "payment_type": {
+                    "type": "string"
+                  },
+                  "transaction_id": {
+                    "type": "string"
+                  },
+                  "gateway_response": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "status": "success",
+                "amount": 18.5,
+                "currency": "USD",
+                "payment_type": "online",
+                "transaction_id": "TXN-20260921-001",
+                "gateway_response": "Payment verified"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PatchPaymentStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{payment_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Payments"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string"
+                  },
+                  "gateway_response": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "status": "success",
+                "gateway_response": "Transaction completed successfully"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "DeletePayment(Soft - Refund)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{payment_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Payments"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/reviews": {
+      "post": {
+        "summary": "CreateReview",
+        "responses": {},
+        "tags": [
+          "Reviews"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string"
+                  },
+                  "restaurant_id": {
+                    "type": "string"
+                  },
+                  "order_id": {
+                    "type": "string"
+                  },
+                  "rating": {
+                    "type": "number"
+                  },
+                  "review_text": {
+                    "type": "string"
+                  },
+                  "images": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "user_id": "{{user_id}}",
+                "restaurant_id": "{{restaurant_id}}",
+                "order_id": "{{order_id}}",
+                "rating": 4.5,
+                "review_text": "Delicious food, fast delivery!",
+                "images": [
+                  "https://example.com/review.jpg"
+                ],
+                "status": "approved"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "GetAllReview",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 10
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Reviews"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "UpdateReview",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{review_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Reviews"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "rating": {
+                    "type": "integer"
+                  },
+                  "review_text": {
+                    "type": "string"
+                  },
+                  "images": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "rating": 5,
+                "review_text": "Excellent food and service!",
+                "images": [
+                  "https://example.com/review-new.jpg"
+                ],
+                "status": "approved"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PatchReview",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{review_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Reviews"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "rating": {
+                    "type": "integer"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "review_text": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "rating": 4,
+                "status": "approved",
+                "review_text": "Updated review text"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "DeleteReview(Soft - Reject)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{review_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Reviews"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/favorites": {
+      "post": {
+        "summary": "AddFavorites",
+        "responses": {},
+        "tags": [
+          "Favorites"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string"
+                  },
+                  "restaurant_id": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "user_id": "6adeb92034512e06161772b8",
+                "restaurant_id": "{{restaurant_id}}"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "GetAllFavorites",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 10
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Favorites"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "DeleteFavoriteByID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{favorite_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Favorites"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/delivery_drivers": {
+      "post": {
+        "summary": "CreateDeliver",
+        "responses": {},
+        "tags": [
+          "DeliveryDrivers"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string"
+                  },
+                  "vehicle_type": {
+                    "type": "string"
+                  },
+                  "license_number": {
+                    "type": "string"
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  },
+                  "latitude": {
+                    "type": "number"
+                  },
+                  "longitude": {
+                    "type": "number"
+                  }
+                }
+              },
+              "example": {
+                "user_id": "{{user_id}}",
+                "vehicle_type": "motorbike",
+                "license_number": "PP-1234",
+                "is_active": true,
+                "latitude": 11.5564,
+                "longitude": 104.9282
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "GetAllDrivers",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 10
+          },
+          {
+            "name": "is_active",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "example": true
+          },
+          {
+            "name": "vehicle_type",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "motorbike"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "DeliveryDrivers"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "UpdateDriver",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{driver_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "DeliveryDrivers"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vehicle_type": {
+                    "type": "string"
+                  },
+                  "license_number": {
+                    "type": "string"
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  },
+                  "latitude": {
+                    "type": "number"
+                  },
+                  "longitude": {
+                    "type": "number"
+                  }
+                }
+              },
+              "example": {
+                "vehicle_type": "car",
+                "license_number": "PP-5678",
+                "is_active": true,
+                "latitude": 11.5564,
+                "longitude": 104.9282
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PatchDriver",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{driver_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "DeliveryDrivers"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "latitude": {
+                    "type": "number"
+                  },
+                  "longitude": {
+                    "type": "number"
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  },
+                  "rating": {
+                    "type": "number"
+                  }
+                }
+              },
+              "example": {
+                "latitude": 11.5564,
+                "longitude": 104.9282,
+                "is_active": false,
+                "rating": 4.8
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "SoftDelete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{driver_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "DeliveryDrivers"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/delivery_assignments": {
+      "post": {
+        "summary": "AssignDriverToOrder",
+        "responses": {},
+        "tags": [
+          "DeliveryAssignments"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "order_id": {
+                    "type": "string"
+                  },
+                  "driver_id": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "delivery_notes": {
+                    "type": "string"
+                  },
+                  "distance_km": {
+                    "type": "number"
+                  },
+                  "delivery_duration": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "order_id": "6ab04d1404bfdeb025c1e66a",
+                "driver_id": "6ab2822b5b3963cd38447df4",
+                "status": "assigned",
+                "delivery_notes": "Handle with care",
+                "distance_km": 2.5,
+                "delivery_duration": 15
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "GetAllAssignments",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 10
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "assigned"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "DeliveryAssignments"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "UpdateAssignment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{assignment_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "DeliveryAssignments"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string"
+                  },
+                  "delivery_notes": {
+                    "type": "string"
+                  },
+                  "distance_km": {
+                    "type": "number"
+                  },
+                  "delivery_duration": {
+                    "type": "integer"
+                  },
+                  "pickup_time": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              "example": {
+                "status": "in_transit",
+                "delivery_notes": "On the way",
+                "distance_km": 2.5,
+                "delivery_duration": 15,
+                "pickup_time": "2026-09-22T10:00:00Z"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PatchAssignmentStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{assignment_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "DeliveryAssignments"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string"
+                  },
+                  "pickup_time": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "delivered_time": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "delivery_notes": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "status": "delivered",
+                "pickup_time": "2026-09-22T10:00:00Z",
+                "delivered_time": "2026-09-22T10:30:00Z",
+                "delivery_notes": "Customer not available"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "SoftDelete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{assignment_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "DeliveryAssignments"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/promotions": {
+      "post": {
+        "summary": "CreatePromotion",
+        "responses": {},
+        "tags": [
+          "Promotions"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  },
+                  "discount_type": {
+                    "type": "string"
+                  },
+                  "discount_value": {
+                    "type": "integer"
+                  },
+                  "min_order_amount": {
+                    "type": "integer"
+                  },
+                  "start_date": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "end_date": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "example": {
+                "name": "Free Delivery",
+                "description": "Free delivery on all orders",
+                "code": "FREEDEL",
+                "discount_type": "free_delivery",
+                "discount_value": 0,
+                "min_order_amount": 15,
+                "start_date": "2026-09-01T00:00:00Z",
+                "end_date": "2026-12-31T23:59:59Z",
+                "is_active": true
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "GetPromotionByID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{promotion_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Promotions"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "UpdatePromotion",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{promotion_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Promotions"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  },
+                  "discount_type": {
+                    "type": "string"
+                  },
+                  "discount_value": {
+                    "type": "integer"
+                  },
+                  "min_order_amount": {
+                    "type": "integer"
+                  },
+                  "max_discount": {
+                    "type": "integer"
+                  },
+                  "applicable_to": {
+                    "type": "string"
+                  },
+                  "start_date": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "end_date": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "usage_limit": {
+                    "type": "integer"
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "example": {
+                "name": "Save 25%",
+                "description": "Get 25% off",
+                "code": "SAVE25",
+                "discount_type": "percentage",
+                "discount_value": 25,
+                "min_order_amount": 15,
+                "max_discount": 8,
+                "applicable_to": "all",
+                "start_date": "2026-09-01T00:00:00Z",
+                "end_date": "2026-12-31T23:59:59Z",
+                "usage_limit": 200,
+                "is_active": true
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PatchPromotion",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{promotion_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Promotions"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "is_active": {
+                    "type": "boolean"
+                  },
+                  "discount_value": {
+                    "type": "integer"
+                  },
+                  "end_date": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              "example": {
+                "is_active": false,
+                "discount_value": 30,
+                "end_date": "2027-06-30T23:59:59Z"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "SoftDelete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{promotion_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Promotions"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
       }
     },
     "/api/notifications": {
+      "post": {
+        "summary": "CreateNotifications",
+        "responses": {},
+        "tags": [
+          "Notifications"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "message": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "user_id": "6ab0430a1c538aae485177b9",
+                "title": "App Update Available",
+                "message": "Version 2.0 is now available with new features",
+                "type": "system"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "GetAllNotification",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 10
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Notifications"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "UpdateNotification",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{notification_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "Notifications"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "message": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "is_read": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "example": {
+                "title": "Order Delivered",
+                "message": "Your order has been delivered. Enjoy!",
+                "type": "order",
+                "is_read": true
+              }
+            }
+          }
+        }
+      },
       "delete": {
         "summary": "SotfDelete",
         "parameters": [
@@ -1202,21 +3131,323 @@
           }
         }
       },
-      "delete": {
-        "summary": "ClearOldsLog",
+      "get": {
+        "summary": "GetAllLog",
         "parameters": [
           {
-            "name": "clear_old",
+            "name": "page",
             "in": "query",
             "schema": {
               "type": "integer"
             },
-            "example": 30
+            "example": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 10
           }
         ],
         "responses": {},
         "tags": [
           "SystemLogs"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "UpdateLog",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{log_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "SystemLogs"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "type": "string"
+                  },
+                  "details": {
+                    "type": "string"
+                  },
+                  "ip_address": {
+                    "type": "string",
+                    "format": "ip-address"
+                  },
+                  "user_agent": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "action": "LOGIN_UPDATED",
+                "details": "Updated log details",
+                "ip_address": "192.168.1.2",
+                "user_agent": "Mozilla/5.0"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PatchLog",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{log_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "SystemLogs"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "details": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "details": "Updated details only"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "DeleteLog",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{log_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "SystemLogs"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/cart_items": {
+      "post": {
+        "summary": "AdddItemTocart",
+        "responses": {},
+        "tags": [
+          "CartItems"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cart_id": {
+                    "type": "string"
+                  },
+                  "menu_id": {
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "type": "integer"
+                  },
+                  "special_notes": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "cart_id": "6adea0242d421f815a645b2a",
+                "menu_id": "{{menu_id}}",
+                "quantity": 2,
+                "special_notes": "No spicy"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "getAllCartItem",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 10
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "CartItems"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "UpdateCartItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{cart_item_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "CartItems"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "quantity": {
+                    "type": "integer"
+                  },
+                  "special_notes": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "quantity": 3,
+                "special_notes": "Extra cheese"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PatchQuantity",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{cart_item_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "CartItems"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "quantity": {
+                    "type": "integer"
+                  },
+                  "special_notes": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "quantity": 5,
+                "special_notes": "No onions"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "RemoveCartItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{cart_item_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "CartItems"
         ],
         "security": [
           {
@@ -1277,6 +3508,168 @@
             }
           }
         }
+      },
+      "get": {
+        "summary": "GetAllMenuOption",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 10
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "MenuOption"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "UpdateOption",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{option_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "MenuOption"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "option_group": {
+                    "type": "string"
+                  },
+                  "option_name": {
+                    "type": "string"
+                  },
+                  "option_price": {
+                    "type": "integer"
+                  },
+                  "is_required": {
+                    "type": "boolean"
+                  },
+                  "selection_type": {
+                    "type": "string"
+                  },
+                  "max_select": {
+                    "type": "integer"
+                  },
+                  "sort_order": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "option_group": "Size",
+                "option_name": "Extra Large",
+                "option_price": 3,
+                "is_required": false,
+                "selection_type": "single",
+                "max_select": 1,
+                "sort_order": 2
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PatchOptionPrice",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{option_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "MenuOption"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "selection_type": {
+                    "type": "string"
+                  },
+                  "max_select": {
+                    "type": "integer"
+                  },
+                  "sort_order": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "selection_type": "multiple",
+                "max_select": 3,
+                "sort_order": 5
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "DeleteOption",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "{{option_id}}"
+          }
+        ],
+        "responses": {},
+        "tags": [
+          "MenuOption"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
       }
     },
     "/api/order_item_options": {
