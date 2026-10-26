@@ -25,7 +25,7 @@ Future<Response> onRequest(RequestContext context) async {
   }
 }
 
-// ==================== GET ====================
+// GET method
 Future<Response> _handleGet(RequestContext context) async {
   try {
     final id = context.request.uri.queryParameters['id'];

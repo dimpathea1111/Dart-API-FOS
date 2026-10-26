@@ -28,7 +28,7 @@ Future<Response> onRequest(RequestContext context) async {
   }
 }
 
-// ==================== GET ====================
+// GET 
 Future<Response> _handleGet(RequestContext context) async {
   final id = context.request.uri.queryParameters['id'];
   final restaurantId = context.request.uri.queryParameters['restaurant_id'];
@@ -390,7 +390,7 @@ Future<Response> _handlePatch(RequestContext context) async {
   }
 }
 
-// ==================== DELETE ====================
+// DELETE
 Future<Response> _handleDelete(RequestContext context) async {
   final id = context.request.uri.queryParameters['id'];
 

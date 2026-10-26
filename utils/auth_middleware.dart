@@ -1,7 +1,6 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'jwt_utils.dart';
 
-// ⭐ Syntax ថ្មី (សម្រាប់ Middleware ថ្មី)
 Middleware authMiddleware() {
   return (handler) {
     return (context) async {
@@ -48,7 +47,6 @@ Middleware authMiddleware() {
   };
 }
 
-// ⭐ Syntax ចាស់ (សម្រាប់ Routes ចាស់ៗ)
 Handler authMiddlewareHandler(Handler handler) {
   return (context) {
     return Future<Response>(() async {

@@ -28,7 +28,7 @@ Future<Response> onRequest(RequestContext context) async {
   }
 }
 
-// ==================== GET ====================
+//  GET mehtod
 Future<Response> _handleGet(RequestContext context) async {
   final id = context.request.uri.queryParameters['id'];
   final cartId = context.request.uri.queryParameters['cart_id'];
@@ -95,7 +95,7 @@ Future<Response> _getCartItemById(String id) async {
       return _error('Cart item not found', statusCode: 404);
     }
 
-    // ទាញ menu details
+    // get menu details
     final menuId = itemMap['menu_id'];
     Map<String, dynamic>? menuData;
     if (menuId is ObjectId) {
@@ -130,7 +130,6 @@ Future<Response> _getCartItemsByCart(String cartId) async {
         .find(where.eq('cart_id', ObjectId.fromHexString(cartId)))
         .toList();
 
-    // ទាញ menu details សម្រាប់ item នីមួយៗ
     final data = <Map<String, dynamic>>[];
     double totalAmount = 0;
 
@@ -188,7 +187,6 @@ Future<Response> _getCartItemsByMenu(String menuId) async {
   }
 }
 
-// ==================== POST ====================
 Future<Response> _handlePost(RequestContext context) async {
   try {
     await DatabaseService.startDb();
@@ -198,7 +196,6 @@ Future<Response> _handlePost(RequestContext context) async {
     final menuId = body['menu_id'] as String?;
     final quantity = body['quantity'] ?? 1;
 
-    // Validation
     if (cartId == null || !ObjectId.isValidHexId(cartId)) {
       return _error('Valid cart_id is required');
     }
@@ -206,7 +203,6 @@ Future<Response> _handlePost(RequestContext context) async {
       return _error('Valid menu_id is required');
     }
 
-    // ទាញ menu ដើម្បីយកតម្លៃ
     final menu = await DatabaseService.menu
         .findOne(where.eq('_id', ObjectId.fromHexString(menuId)));
     if (menu == null) {
@@ -217,14 +213,12 @@ Future<Response> _handlePost(RequestContext context) async {
         .toDouble();
     final subtotal = unitPrice * (quantity as num).toInt();
 
-    // ពិនិត្យថាតើ item មានរួចហើយឬនៅ
     final existing = await DatabaseService.cartItems.findOne({
       'cart_id': ObjectId.fromHexString(cartId),
       'menu_id': ObjectId.fromHexString(menuId),
     });
 
     if (existing != null) {
-      // Update quantity
       final newQuantity = (existing['quantity'] as num).toInt() +
           (quantity as num).toInt();
       final newSubtotal = unitPrice * newQuantity;
@@ -279,7 +273,6 @@ Future<Response> _handlePost(RequestContext context) async {
   }
 }
 
-// ==================== PUT ====================
 Future<Response> _handlePut(RequestContext context) async {
   final id = context.request.uri.queryParameters['id'];
 
@@ -337,7 +330,6 @@ Future<Response> _handlePut(RequestContext context) async {
   }
 }
 
-// ==================== PATCH ====================
 Future<Response> _handlePatch(RequestContext context) async {
   final id = context.request.uri.queryParameters['id'];
 
@@ -401,7 +393,6 @@ Future<Response> _handlePatch(RequestContext context) async {
   }
 }
 
-// ==================== DELETE ====================
 Future<Response> _handleDelete(RequestContext context) async {
   final id = context.request.uri.queryParameters['id'];
   final cartId = context.request.uri.queryParameters['cart_id'];
@@ -409,7 +400,6 @@ Future<Response> _handleDelete(RequestContext context) async {
   try {
     await DatabaseService.startDb();
 
-    // Clear all items in cart
     if (cartId != null && cartId.isNotEmpty) {
       if (!ObjectId.isValidHexId(cartId)) {
         return _error('Invalid cart ID format', statusCode: 400);
@@ -425,7 +415,6 @@ Future<Response> _handleDelete(RequestContext context) async {
       });
     }
 
-    // Delete single item
     if (id == null || id.isEmpty) {
       return _error('id or cart_id is required');
     }
@@ -452,7 +441,6 @@ Future<Response> _handleDelete(RequestContext context) async {
   }
 }
 
-// ==================== HELPERS ====================
 Response _error(String message, {int statusCode = 400}) {
   return Response.json(
     statusCode: statusCode,

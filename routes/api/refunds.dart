@@ -28,7 +28,7 @@ Future<Response> onRequest(RequestContext context) async {
   }
 }
 
-// ==================== GET ====================
+//  GET 
 Future<Response> _handleGet(RequestContext context) async {
   final id = context.request.uri.queryParameters['id'];
   final orderId = context.request.uri.queryParameters['order_id'];
@@ -171,7 +171,7 @@ Future<Response> _getRefundsByPayment(String paymentId) async {
   }
 }
 
-// ==================== POST ====================
+// POST 
 Future<Response> _handlePost(RequestContext context) async {
   try {
     await DatabaseService.startDb();
@@ -235,7 +235,7 @@ Future<Response> _handlePost(RequestContext context) async {
   }
 }
 
-// ==================== PUT ====================
+//PUT 
 Future<Response> _handlePut(RequestContext context) async {
   final id = context.request.uri.queryParameters['id'];
 
@@ -307,7 +307,7 @@ Future<Response> _handlePut(RequestContext context) async {
   }
 }
 
-// ==================== PATCH ====================
+// PATCH
 Future<Response> _handlePatch(RequestContext context) async {
   final id = context.request.uri.queryParameters['id'];
 
@@ -395,7 +395,7 @@ Future<Response> _handlePatch(RequestContext context) async {
   }
 }
 
-// ==================== DELETE ====================
+// DELETE
 Future<Response> _handleDelete(RequestContext context) async {
   final id = context.request.uri.queryParameters['id'];
   final orderId = context.request.uri.queryParameters['order_id'];
@@ -460,7 +460,6 @@ Future<Response> _handleDelete(RequestContext context) async {
   }
 }
 
-// ==================== HELPERS ====================
 Response _error(String message, {int statusCode = 400}) {
   return Response.json(
     statusCode: statusCode,

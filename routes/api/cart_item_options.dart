@@ -28,7 +28,6 @@ Future<Response> onRequest(RequestContext context) async {
   }
 }
 
-// ==================== GET ====================
 Future<Response> _handleGet(RequestContext context) async {
   final id = context.request.uri.queryParameters['id'];
   final cartItemId = context.request.uri.queryParameters['cart_item_id'];
@@ -179,7 +178,6 @@ Future<Response> _getOptionsByMenuOption(String menuOptionId) async {
   }
 }
 
-// ==================== POST ====================
 Future<Response> _handlePost(RequestContext context) async {
   try {
     await DatabaseService.startDb();
@@ -234,7 +232,6 @@ Future<Response> _handlePost(RequestContext context) async {
   }
 }
 
-// ==================== PUT ====================
 Future<Response> _handlePut(RequestContext context) async {
   final id = context.request.uri.queryParameters['id'];
 
@@ -294,7 +291,6 @@ Future<Response> _handlePut(RequestContext context) async {
   }
 }
 
-// ==================== PATCH ====================
 Future<Response> _handlePatch(RequestContext context) async {
   final id = context.request.uri.queryParameters['id'];
 
@@ -359,7 +355,6 @@ Future<Response> _handlePatch(RequestContext context) async {
   }
 }
 
-// ==================== DELETE ====================
 Future<Response> _handleDelete(RequestContext context) async {
   final id = context.request.uri.queryParameters['id'];
   final cartItemId = context.request.uri.queryParameters['cart_item_id'];
@@ -383,7 +378,6 @@ Future<Response> _handleDelete(RequestContext context) async {
       });
     }
 
-    // Delete single option
     if (id == null || id.isEmpty) {
       return _error('id or cart_item_id is required');
     }
@@ -410,7 +404,6 @@ Future<Response> _handleDelete(RequestContext context) async {
   }
 }
 
-// ==================== HELPERS ====================
 Response _error(String message, {int statusCode = 400}) {
   return Response.json(
     statusCode: statusCode,

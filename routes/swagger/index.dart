@@ -30,7 +30,6 @@ Future<Response> onRequest(RequestContext context) async {
 </html>
   ''';
 
-  // ប្រើ Response() ធម្មតា ជំនួសឱ្យ Response.json() ដើម្បីបង្ហាញ HTML
   return Response(
     body: html,
     headers: {

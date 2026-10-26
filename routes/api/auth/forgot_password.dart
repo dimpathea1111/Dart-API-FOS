@@ -31,7 +31,7 @@ Future<Response> onRequest(RequestContext context) async {
       'is_used': false,
     });
 
-    print('📧 OTP for $email: $otp');
+    print(' OTP for $email: $otp');
 
     return Response.json(
       body: {
